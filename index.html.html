@@ -9,32 +9,32 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* App (light) palette */
-  --bg: #f5f4f1;
-  --surface: #ffffff;
-  --border: #e5e3de;
-  --border-strong: #ccc9c0;
-  --text: #141412;
-  --text-secondary: #5c5a55;
-  --text-muted: #9b9790;
-  --accent: #1a6b4a;
-  --accent-light: #e6f2ec;
-  --accent-mid: #2d9e70;
-  --danger: #b83232;
-  --danger-light: #fdf0ee;
-  --warning: #a07010;
-  --warning-light: #fdf6e3;
-  --bull: #1a6b4a;
-  --bear: #b83232;
-  --base-col: #2c5f8a;
+  /* App palette — matches landing dark theme */
+  --bg: #0d0d0b;
+  --surface: #141412;
+  --border: #2a2a26;
+  --border-strong: #3a3a35;
+  --text: #ffffff;
+  --text-secondary: #c8c6c2;
+  --text-muted: #8a8880;
+  --accent: #b8bcc4;
+  --accent-light: rgba(184,188,196,0.12);
+  --accent-mid: #d0d4dc;
+  --danger: #e05555;
+  --danger-light: rgba(224,85,85,0.12);
+  --warning: #d4a843;
+  --warning-light: rgba(212,168,67,0.12);
+  --bull: #3dba80;
+  --bear: #e05555;
+  --base-col: #7aabdc;
 
   /* Landing (dark) palette */
   --land-bg: #0d0d0b;
   --land-surface: #141412;
   --land-border: #2a2a26;
-  --land-text: #f0ede6;
-  --land-text-dim: #8a8880;
-  --land-text-muted: #4a4845;
+  --land-text: #ffffff;
+  --land-text-dim: #c8c6c2;
+  --land-text-muted: #8a8880;
   --land-accent: #b8bcc4;       /* silver */
   --land-accent-dim: #7a8088;
   --land-green: #3dba80;
@@ -110,7 +110,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 .land-nav-link {
   font-size: 13px;
-  color: var(--land-text-dim);
+  color: #c8c6c2;
   text-decoration: none;
   cursor: pointer;
   transition: colour 0.15s;
@@ -129,7 +129,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   padding: 8px 20px;
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
-  color: var(--land-text-dim);
+  color: #c8c6c2;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -208,7 +208,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 .land-sub {
   font-size: 16px;
-  color: var(--land-text-dim);
+  color: #c8c6c2;
   line-height: 1.7;
   max-width: 460px;
   margin-bottom: 48px;
@@ -244,7 +244,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   padding: 13px 28px;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
-  color: var(--land-text-dim);
+  color: #c8c6c2;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -269,7 +269,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 .land-stat-label {
   font-size: 12px;
-  color: var(--land-text-muted);
+  color: #a0a09a;
   letter-spacing: 0.02em;
 }
 
@@ -314,7 +314,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--land-text-muted);
+  color: #a0a09a;
   margin-bottom: 4px;
 }
 
@@ -439,7 +439,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   font-family: 'Playfair Display', serif;
   font-size: clamp(28px, 3vw, 42px);
   font-weight: 700;
-  color: var(--land-text);
+  color: #ffffff;
   letter-spacing: -0.5px;
   margin-bottom: 60px;
   max-width: 560px;
@@ -476,7 +476,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .feat-num {
   font-family: 'DM Mono', monospace;
   font-size: 10px;
-  color: var(--land-text-muted);
+  color: #a0a09a;
   letter-spacing: 0.1em;
   margin-bottom: 10px;
 }
@@ -492,7 +492,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 .feat-desc {
   font-size: 13px;
-  color: var(--land-text-dim);
+  color: #c8c6c2;
   line-height: 1.65;
   font-weight: 300;
 }
@@ -534,13 +534,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .step-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--land-text);
+  color: #ffffff;
   margin-bottom: 8px;
 }
 
 .step-desc {
   font-size: 12px;
-  color: var(--land-text-dim);
+  color: #c8c6c2;
   line-height: 1.6;
   font-weight: 300;
 }
@@ -575,7 +575,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--land-text-muted);
+  color: #a0a09a;
   margin-bottom: 20px;
 }
 
@@ -591,10 +591,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   line-height: 1;
 }
 
-.price-period { font-size: 12px; color: var(--land-text-muted); margin-bottom: 28px; font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+.price-period { font-size: 12px; color: #a0a09a; margin-bottom: 28px; font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
 .price-divider { height: 1px; background: var(--land-border); margin-bottom: 24px; }
 .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-.price-features li { font-size: 13px; color: var(--land-text-dim); display: flex; gap: 10px; align-items: flex-start; font-weight: 300; }
+.price-features li { font-size: 13px; color: #c8c6c2; display: flex; gap: 10px; align-items: flex-start; font-weight: 300; }
 .price-features li::before { content: '—'; color: var(--land-accent); flex-shrink: 0; font-family: 'DM Mono', monospace; }
 
 .featured-badge {
@@ -620,14 +620,14 @@ header {
 .header-logo-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; letter-spacing: -0.2px; }
 .header-logo-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border); padding: 2px 7px; border-radius: 3px; }
 .header-right { display: flex; align-items: centre; gap: 12px; }
-.badge { font-family: 'DM Mono', monospace; font-size: 10px; background: var(--accent-light); color: var(--accent); padding: 3px 8px; border-radius: 3px; }
+.badge { font-family: 'DM Mono', monospace; font-size: 10px; background: var(--accent-light); color: var(--accent); padding: 3px 8px; border-radius: 3px; letter-spacing: 0.04em; }
 
 .main { max-width: 1320px; margin: 0 auto; padding: 36px 48px; }
 
 /* API Key Banner */
 .api-banner {
-  background: var(--warning-light);
-  border: 1px solid #e8c84a;
+  background: rgba(212,168,67,0.1);
+  border: 1px solid rgba(212,168,67,0.3);
   border-radius: 8px;
   padding: 14px 20px;
   margin-bottom: 24px;
@@ -637,21 +637,21 @@ header {
   font-size: 13px;
 }
 
-.api-banner-text { flex: 1; color: var(--warning); }
+.api-banner-text { flex: 1; color: #d4a843; }
 .api-banner-text strong { font-weight: 600; }
 
 .api-inputs { display: flex; gap: 8px; flex: 2; }
 
 .api-input {
-  flex: 1; border: 1px solid #e8c84a; border-radius: 5px;
+  flex: 1; border: 1px solid rgba(212,168,67,0.3); border-radius: 5px;
   padding: 7px 12px; font-family: 'DM Mono', monospace; font-size: 11px;
-  background: white; outline: none; color: var(--text);
+  background: rgba(255,255,255,0.05); outline: none; color: var(--text);
 }
 .api-input:focus { border-color: var(--accent); }
 .api-input::placeholder { color: var(--text-muted); }
 
 .btn-sm {
-  background: var(--text); color: white; border: none; border-radius: 5px;
+  background: var(--accent); color: #141412; border: none; border-radius: 5px;
   padding: 7px 14px; font-size: 12px; font-weight: 500; cursor: pointer;
   white-space: nowrap; transition: opacity 0.15s; font-family: 'DM Sans', sans-serif;
 }
@@ -682,7 +682,7 @@ header {
 .meta-value { font-size: 14px; font-weight: 500; }
 
 .load-btn {
-  margin-left: auto; background: var(--text); color: white; border: none;
+  margin-left: auto; background: var(--accent); color: #141412; border: none;
   border-radius: 6px; padding: 9px 20px; font-family: 'DM Sans', sans-serif;
   font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; white-space: nowrap;
 }
@@ -769,7 +769,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .breakdown-table td { padding: 9px 0; border-top: 1px solid var(--border); font-size: 13px; }
 .breakdown-table td:last-child { text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-secondary); }
 .breakdown-table tr:last-child td { font-weight: 600; color: var(--text); border-top: 2px solid var(--border-strong); padding-top: 12px; }
-.breakdown-table tr:last-child td:last-child { color: var(--accent); font-size: 14px; }
+.breakdown-table tr:last-child td:last-child { color: var(--accent-mid); font-size: 14px; }
 
 /* AI panel */
 
@@ -1124,8 +1124,8 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
       <span style="font-family:'Playfair Display',serif;font-size:16px;color:var(--land-text);">Financial Foresights</span>
       <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--land-text-muted);letter-spacing:0.1em;">FINANCIAL FORESIGHT</span>
     </div>
-    <span style="font-size:12px;color:var(--land-text-muted);">For informational purposes only. This platform does not constitute financial advice.</span>
-    <span style="font-size:12px;color:var(--land-text-muted);font-family:'DM Mono',monospace;">© 2025 Financial Foresights</span>
+    <span style="font-size:12px;color:#a0a09a;">For informational purposes only. This platform does not constitute financial advice.</span>
+    <span style="font-size:12px;color:#a0a09a;font-family:'DM Mono',monospace;">© 2025 Financial Foresights</span>
   </footer>
 
 </div>
@@ -1138,12 +1138,11 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   <header>
     <div class="header-logo">
       <span class="header-logo-name">Financial Foresights</span>
-      <span class="header-logo-tag">Financial Foresights</span>
     </div>
     <div class="header-right">
       <span class="data-source"><span class="live-dot"></span> <span id="dataSourceLabel">Demo Data</span></span>
       <span class="badge">DCF · Scenarios · Risk · AI</span>
-      <button class="btn-ghost" style="font-size:12px;padding:6px 14px;" onclick="showLanding()">← Back</button>
+      <button class="btn-land-ghost" style="font-size:12px;padding:6px 14px;" onclick="showLanding()">← Back</button>
     </div>
   </header>
 
