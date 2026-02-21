@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Financial Foresights — Look Further. Invest Smarter.</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -841,6 +843,241 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .data-source { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); display: flex; align-items: centre; gap: 4px; }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; animation: livePulse 2s ease-in-out infinite; }
 @keyframes livePulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* ════════════════════════════════════
+   AUTH MODAL
+════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: #1a1a17;
+  border: 1px solid #2a2a26;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  transform: translateY(12px);
+  transition: transform 0.2s;
+}
+.modal-overlay.visible .modal { transform: translateY(0); }
+
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; color: #8a8880;
+  font-size: 20px; cursor: pointer; line-height: 1;
+  transition: color 0.15s;
+}
+.modal-close:hover { color: #ffffff; }
+
+.modal-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 600;
+  color: #ffffff; margin-bottom: 6px;
+}
+
+.modal-subtitle {
+  font-size: 13px; color: #8a8880;
+  margin-bottom: 28px;
+}
+
+.modal-tabs {
+  display: flex; gap: 0;
+  background: #0d0d0b;
+  border-radius: 6px; padding: 3px;
+  margin-bottom: 24px;
+}
+
+.modal-tab {
+  flex: 1; padding: 7px;
+  border: none; background: transparent;
+  border-radius: 4px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: #8a8880;
+  cursor: pointer; transition: all 0.15s;
+}
+.modal-tab.active {
+  background: #2a2a26; color: #ffffff;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #8a8880;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%; padding: 10px 14px;
+  background: #0d0d0b;
+  border: 1px solid #2a2a26;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; color: #ffffff;
+  outline: none; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: #b8bcc4; }
+.form-input::placeholder { color: #4a4845; }
+
+.form-btn {
+  width: 100%; padding: 12px;
+  background: #b8bcc4; color: #141412;
+  border: none; border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+  margin-top: 8px;
+}
+.form-btn:hover { opacity: 0.88; }
+.form-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+.form-error {
+  font-size: 12px; color: #e05555;
+  margin-top: 12px; text-align: center;
+  min-height: 18px;
+}
+
+.form-success {
+  font-size: 12px; color: #3dba80;
+  margin-top: 12px; text-align: center;
+}
+
+.modal-divider {
+  height: 1px; background: #2a2a26;
+  margin: 20px 0;
+}
+
+/* ── USER MENU in header ── */
+.user-menu {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.user-avatar {
+  width: 30px; height: 30px;
+  background: #b8bcc4; color: #141412;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+}
+
+.user-plan-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 3px;
+  text-transform: uppercase;
+}
+.plan-free { background: rgba(184,188,196,0.1); color: #8a8880; }
+.plan-pro { background: rgba(184,188,196,0.15); color: #b8bcc4; }
+.plan-team { background: rgba(61,186,128,0.15); color: #3dba80; }
+
+.user-dropdown {
+  position: absolute; top: 38px; right: 0;
+  background: #1a1a17; border: 1px solid #2a2a26;
+  border-radius: 8px; padding: 8px;
+  min-width: 200px; z-index: 200;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.user-dropdown.open { display: block; }
+
+.dropdown-email {
+  font-size: 11px; color: #8a8880;
+  padding: 6px 8px 10px;
+  border-bottom: 1px solid #2a2a26;
+  margin-bottom: 6px;
+  font-family: 'DM Mono', monospace;
+}
+
+.dropdown-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 5px;
+  font-size: 13px; color: #c8c6c2;
+  cursor: pointer; transition: background 0.15s;
+  border: none; background: none; width: 100%;
+  text-align: left; font-family: 'DM Sans', sans-serif;
+}
+.dropdown-item:hover { background: #2a2a26; color: #ffffff; }
+.dropdown-item.danger { color: #e05555; }
+.dropdown-item.danger:hover { background: rgba(224,85,85,0.1); }
+
+/* ── UPGRADE MODAL ── */
+.upgrade-plans {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-bottom: 20px;
+}
+
+.upgrade-plan {
+  border: 1px solid #2a2a26; border-radius: 8px;
+  padding: 16px 18px; cursor: pointer;
+  transition: border-color 0.15s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.upgrade-plan:hover { border-color: #b8bcc4; }
+.upgrade-plan.selected { border-color: #b8bcc4; background: rgba(184,188,196,0.05); }
+
+.upgrade-plan-name {
+  font-size: 14px; font-weight: 600; color: #ffffff;
+  margin-bottom: 2px;
+}
+.upgrade-plan-desc {
+  font-size: 12px; color: #8a8880;
+}
+.upgrade-plan-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; color: #ffffff;
+}
+.upgrade-plan-period {
+  font-size: 11px; color: #8a8880;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── AI LOCKED STATE ── */
+.ai-locked {
+  text-align: center; padding: 24px;
+  border: 1px dashed #2a2a26; border-radius: 8px;
+}
+.ai-locked-icon { font-size: 24px; margin-bottom: 10px; }
+.ai-locked-title {
+  font-size: 14px; font-weight: 600; color: #ffffff;
+  margin-bottom: 6px;
+}
+.ai-locked-desc { font-size: 13px; color: #8a8880; margin-bottom: 16px; }
+.ai-locked-btn {
+  background: #b8bcc4; color: #141412;
+  border: none; border-radius: 6px;
+  padding: 9px 20px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.ai-locked-btn:hover { opacity: 0.88; }
+
+/* ── USAGE COUNTER ── */
+.usage-bar {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px; color: #8a8880;
+  font-family: 'DM Mono', monospace;
+}
+.usage-pips {
+  display: flex; gap: 3px;
+}
+.usage-pip {
+  width: 8px; height: 8px; border-radius: 2px;
+  background: #2a2a26;
+}
+.usage-pip.used { background: #b8bcc4; }
+
 </style>
 </head>
 <body>
@@ -1084,7 +1321,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
           <li>Full DCF model</li>
           <li>Sensitivity table</li>
         </ul>
-        <button class="btn-land-ghost" style="width:100%;" onclick="showApp()">Get Started</button>
+        <button class="btn-land-ghost" style="width:100%;" onclick="openModal('authModal')">Get Started</button>
       </div>
       <div class="price-card featured">
         <div class="featured-badge">Most Popular</div>
@@ -1099,7 +1336,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
           <li>Watchlist & saved models</li>
           <li>Historical comparison</li>
         </ul>
-        <button class="btn-land-primary" style="width:100%;" onclick="showApp()">Begin Free Trial</button>
+        <button class="btn-land-primary" style="width:100%;" onclick="openModal('upgradeModal')">Begin Free Trial</button>
       </div>
       <div class="price-card">
         <div class="price-card-label">Team</div>
@@ -1141,8 +1378,24 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     </div>
     <div class="header-right">
       <span class="data-source"><span class="live-dot"></span> <span id="dataSourceLabel">Demo Data</span></span>
-      <span class="badge">DCF · Scenarios · Risk · AI</span>
-      <button class="btn-land-ghost" style="font-size:12px;padding:6px 14px;" onclick="showLanding()">← Back</button>
+      <div class="usage-bar" id="usageBar" style="display:none;">
+        <div class="usage-pips" id="usagePips"></div>
+        <span id="usageLabel">0/3 analyses</span>
+      </div>
+      <div id="headerAuth">
+        <button class="btn-land-ghost" style="font-size:12px;padding:6px 14px;margin-right:6px;" onclick="openModal('authModal')">Sign In</button>
+        <button class="btn-land-primary" style="font-size:12px;padding:7px 14px;" onclick="openModal('authModal')">Get Started</button>
+      </div>
+      <div class="user-menu" id="headerUser" style="display:none;">
+        <span class="user-plan-badge plan-free" id="planBadge">Free</span>
+        <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">U</div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-email" id="dropdownEmail">user@example.com</div>
+          <button class="dropdown-item" onclick="openModal('upgradeModal')">⬆ Upgrade Plan</button>
+          <button class="dropdown-item" onclick="showLanding()">← Back to Home</button>
+          <button class="dropdown-item danger" onclick="signOut()">Sign Out</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -1468,6 +1721,18 @@ async function loadCompany() {
   const ticker = document.getElementById('tickerInput').value.toUpperCase().trim();
   if (!ticker) return;
 
+  // Gate: must be signed in
+  if (!currentUser) {
+    openModal('authModal');
+    return;
+  }
+
+  // Gate: free plan usage limit
+  if (!canRunAnalysis() && !isPro()) {
+    openModal('upgradeModal');
+    return;
+  }
+
   const btn = document.getElementById('loadBtn');
   btn.innerHTML = '<span class="loading-spinner"></span>Loading...';
   btn.classList.add('loading');
@@ -1501,6 +1766,7 @@ async function loadCompany() {
     updateCompanyBar();
     renderSliders();
     compute();
+    incrementUsage();
 
     // Reset AI panel
     document.getElementById('aiGenBtn').style.display = 'flex';
@@ -1860,10 +2126,370 @@ Respond with ONLY a valid JSON object, no markdown, no extra text:
   }
 }
 
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE + STRIPE CONFIG
+// Replace these placeholders with your real keys
+// using Find & Replace in a text editor on your computer
+// ═══════════════════════════════════════════════════════
+
+const SUPABASE_URL = 'https://gpznogwtpakvlmhouuwg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdwem5vZ3d0cGFrdmxtaG91dXdnIiwicm9sZSI6ImFub24iLCJpYXQiOj';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51T3LygDNXtDSAjJ8SefuLJbcIqeviyBJuOy1Oh4Mwxe1hB1wIJyqf8za3ACFxhPxLxxHpWZinIwDT6IBaqtyYs7k007iFNRbHE';
+const STRIPE_PRO_PRICE_ID = 'price_1T3M4BDNXtDSAjJ80HyditBB';
+const STRIPE_TEAM_PRICE_ID = 'price_1T3M4iDNXtDSAjJ8t1038D1j';
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
+let currentUser = null;
+let currentPlan = 'free'; // 'free' | 'pro' | 'team'
+let analysesUsedToday = 0;
+const FREE_ANALYSIS_LIMIT = 3;
+let selectedUpgradePlan = 'pro';
+let authMode = 'signin';
+
+// ── On page load, check if user is already signed in
+window.addEventListener('load', async () => {
+  const { data: { session } } = await _supabase.auth.getSession();
+  if (session) {
+    await onSignedIn(session.user);
+  }
+
+  // Listen for auth state changes
+  _supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await onSignedIn(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      onSignedOut();
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// AUTH HANDLERS
+// ═══════════════════════════════════════════════════════
+
+function openModal(id) {
+  document.getElementById(id).classList.add('visible');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('visible');
+  document.getElementById('authError') && (document.getElementById('authError').textContent = '');
+}
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.querySelectorAll('.modal-tab').forEach((t, i) => {
+    t.classList.toggle('active', (mode === 'signin' && i === 0) || (mode === 'signup' && i === 1));
+  });
+  const btn = document.getElementById('authSubmitBtn');
+  btn.textContent = mode === 'signin' ? 'Sign In' : 'Create Account';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  const btn = document.getElementById('authSubmitBtn');
+
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+  errEl.textContent = '';
+
+  let result;
+  if (authMode === 'signin') {
+    result = await _supabase.auth.signInWithPassword({ email, password });
+  } else {
+    result = await _supabase.auth.signUp({ email, password });
+  }
+
+  btn.disabled = false;
+  btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+
+  if (result.error) {
+    errEl.textContent = result.error.message;
+    return;
+  }
+
+  if (authMode === 'signup' && !result.data.session) {
+    errEl.style.color = '#3dba80';
+    errEl.textContent = 'Account created — please check your email to confirm.';
+    return;
+  }
+
+  closeModal('authModal');
+}
+
+async function onSignedIn(user) {
+  currentUser = user;
+
+  // Load plan from user metadata or default to free
+  const meta = user.user_metadata || {};
+  currentPlan = meta.plan || 'free';
+
+  // Load today's usage from localStorage (keyed by user + date)
+  const today = new Date().toISOString().slice(0, 10);
+  const usageKey = `ff_usage_${user.id}_${today}`;
+  analysesUsedToday = parseInt(localStorage.getItem(usageKey) || '0');
+
+  updateHeaderForUser(user);
+  updateAIGate();
+  updateUsageBar();
+}
+
+function onSignedOut() {
+  currentUser = null;
+  currentPlan = 'free';
+  analysesUsedToday = 0;
+  document.getElementById('headerAuth').style.display = 'flex';
+  document.getElementById('headerUser').style.display = 'none';
+  updateAIGate();
+  updateUsageBar();
+}
+
+async function signOut() {
+  await _supabase.auth.signOut();
+  toggleDropdown(true);
+}
+
+function updateHeaderForUser(user) {
+  document.getElementById('headerAuth').style.display = 'none';
+  document.getElementById('headerUser').style.display = 'flex';
+
+  // Avatar initials
+  const email = user.email || '';
+  document.getElementById('userAvatar').textContent = email[0].toUpperCase();
+  document.getElementById('dropdownEmail').textContent = email;
+
+  // Plan badge
+  const badge = document.getElementById('planBadge');
+  badge.textContent = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+  badge.className = 'user-plan-badge plan-' + currentPlan;
+}
+
+function toggleDropdown(forceClose = false) {
+  const dd = document.getElementById('userDropdown');
+  if (forceClose) { dd.classList.remove('open'); return; }
+  dd.classList.toggle('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('userDropdown');
+  const avatar = document.getElementById('userAvatar');
+  if (menu && !menu.contains(e.target) && e.target !== avatar) {
+    menu.classList.remove('open');
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// PLAN GATING
+// ═══════════════════════════════════════════════════════
+
+function isPro() {
+  return currentPlan === 'pro' || currentPlan === 'team';
+}
+
+function canRunAnalysis() {
+  if (!currentUser) return false;
+  if (isPro()) return true;
+  return analysesUsedToday < FREE_ANALYSIS_LIMIT;
+}
+
+function incrementUsage() {
+  if (!currentUser || isPro()) return;
+  analysesUsedToday++;
+  const today = new Date().toISOString().slice(0, 10);
+  const usageKey = `ff_usage_${currentUser.id}_${today}`;
+  localStorage.setItem(usageKey, analysesUsedToday.toString());
+  updateUsageBar();
+  updateAIGate();
+}
+
+function updateUsageBar() {
+  const bar = document.getElementById('usageBar');
+  if (!currentUser || isPro()) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const pips = document.getElementById('usagePips');
+  pips.innerHTML = Array.from({ length: FREE_ANALYSIS_LIMIT }, (_, i) =>
+    `<div class="usage-pip ${i < analysesUsedToday ? 'used' : ''}"></div>`
+  ).join('');
+  document.getElementById('usageLabel').textContent =
+    `${analysesUsedToday}/${FREE_ANALYSIS_LIMIT} analyses today`;
+}
+
+function updateAIGate() {
+  const wrapper = document.getElementById('aiGateWrapper');
+  const btn = document.getElementById('aiGenBtn');
+  if (!wrapper) return;
+
+  if (!currentUser) {
+    // Not signed in
+    wrapper.innerHTML = `
+      <div class="ai-locked">
+        <div class="ai-locked-icon">🔒</div>
+        <div class="ai-locked-title">Sign in to access AI Analysis</div>
+        <div class="ai-locked-desc">Create a free account to get AI-powered model insights.</div>
+        <button class="ai-locked-btn" onclick="openModal('authModal')">Sign In / Register</button>
+      </div>`;
+    btn.style.display = 'none';
+  } else if (!isPro()) {
+    // Signed in but free plan
+    wrapper.innerHTML = `
+      <div class="ai-locked">
+        <div class="ai-locked-icon">✦</div>
+        <div class="ai-locked-title">AI Analysis — Pro Feature</div>
+        <div class="ai-locked-desc">Upgrade to Pro to unlock AI-powered analysis, key drivers, risk flags, and investment verdicts.</div>
+        <button class="ai-locked-btn" onclick="openModal('upgradeModal')">Upgrade to Pro — £19/month</button>
+      </div>`;
+    btn.style.display = 'none';
+  } else {
+    // Pro or Team
+    wrapper.innerHTML = '';
+    btn.style.display = 'flex';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// STRIPE PAYMENTS
+// ═══════════════════════════════════════════════════════
+
+function selectPlan(plan) {
+  selectedUpgradePlan = plan;
+  document.getElementById('planPro').classList.toggle('selected', plan === 'pro');
+  document.getElementById('planTeam').classList.toggle('selected', plan === 'team');
+}
+
+async function handleUpgrade() {
+  if (!currentUser) {
+    closeModal('upgradeModal');
+    openModal('authModal');
+    return;
+  }
+
+  const errEl = document.getElementById('upgradeError');
+  errEl.textContent = '';
+  const btn = document.querySelector('#upgradeModal .form-btn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to payment…';
+
+  const priceId = selectedUpgradePlan === 'pro' ? STRIPE_PRO_PRICE_ID : STRIPE_TEAM_PRICE_ID;
+
+  try {
+    // Create a Stripe Checkout session via Supabase Edge Function
+    const { data, error } = await _supabase.functions.invoke('create-checkout', {
+      body: {
+        priceId,
+        userId: currentUser.id,
+        email: currentUser.email,
+        successUrl: window.location.origin + '?upgraded=true',
+        cancelUrl: window.location.origin,
+      }
+    });
+
+    if (error || !data?.url) throw new Error(error?.message || 'Could not create checkout session.');
+
+    window.location.href = data.url;
+  } catch (err) {
+    errEl.textContent = err.message;
+    btn.disabled = false;
+    btn.textContent = 'Continue to Payment →';
+  }
+}
+
+// Handle return from Stripe
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('upgraded') === 'true') {
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+    // Show success message after a brief delay
+    setTimeout(() => {
+      if (currentUser) {
+        alert('Payment successful — your plan has been upgraded. Welcome to Pro!');
+      }
+    }, 1500);
+  }
+});
+
 // ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 // Landing page shown by default; app initializes on showApp()
 </script>
+
+<!-- ════════════════════════════════════════════════
+     AUTH MODAL
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    <div class="modal-logo">Financial Foresights</div>
+    <div class="modal-subtitle">Sign in to access your account</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="modal-tab" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+    <div id="signinForm">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="authEmail" type="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="authPassword" type="password" placeholder="••••••••" />
+      </div>
+      <button class="form-btn" id="authSubmitBtn" onclick="handleAuth()">Sign In</button>
+      <div class="form-error" id="authError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     UPGRADE MODAL
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('upgradeModal')">×</button>
+    <div class="modal-logo">Upgrade Your Plan</div>
+    <div class="modal-subtitle">Unlock AI analysis and unlimited access</div>
+    <div class="upgrade-plans">
+      <div class="upgrade-plan selected" id="planPro" onclick="selectPlan('pro')">
+        <div>
+          <div class="upgrade-plan-name">Pro</div>
+          <div class="upgrade-plan-desc">Unlimited analyses · AI insights · PDF export</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="upgrade-plan-price">£19</div>
+          <div class="upgrade-plan-period">/month</div>
+        </div>
+      </div>
+      <div class="upgrade-plan" id="planTeam" onclick="selectPlan('team')">
+        <div>
+          <div class="upgrade-plan-name">Team</div>
+          <div class="upgrade-plan-desc">5 seats · Shared watchlists · API access</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="upgrade-plan-price">£49</div>
+          <div class="upgrade-plan-period">/month</div>
+        </div>
+      </div>
+    </div>
+    <button class="form-btn" onclick="handleUpgrade()">Continue to Payment →</button>
+    <div class="form-error" id="upgradeError"></div>
+    <div style="margin-top:16px;font-size:11px;color:#4a4845;text-align:center;">
+      Payments processed securely by Stripe · Cancel anytime
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
