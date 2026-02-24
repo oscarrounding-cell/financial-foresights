@@ -1,0 +1,1475 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Foresights — Look Further. Invest Smarter.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0d0b;
+  --surface: #141412;
+  --surface-2: #1a1a17;
+  --surface-3: #1e1e1a;
+  --border: #2a2a26;
+  --border-strong: #3a3a35;
+  --text: #ffffff;
+  --text-secondary: #c8c6c2;
+  --text-muted: #8a8880;
+  --accent: #b8bcc4;
+  --accent-light: rgba(184,188,196,0.12);
+  --accent-mid: #d0d4dc;
+  --danger: #e05555;
+  --danger-light: rgba(224,85,85,0.12);
+  --warning: #d4a843;
+  --warning-light: rgba(212,168,67,0.12);
+  --bull: #3dba80;
+  --bull-light: rgba(61,186,128,0.12);
+  --bear: #e05555;
+  --bear-light: rgba(224,85,85,0.12);
+  --base-col: #7aabdc;
+  --base-light: rgba(122,171,220,0.12);
+  --purple: #a78bfa;
+  --purple-light: rgba(167,139,250,0.12);
+  --land-bg: #0d0d0b;
+  --land-surface: #141412;
+  --land-border: #2a2a26;
+  --land-text: #ffffff;
+  --land-text-dim: #c8c6c2;
+  --land-text-muted: #8a8880;
+  --land-accent: #b8bcc4;
+  --land-accent-dim: #7a8088;
+  --land-green: #3dba80;
+}
+
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; }
+
+/* ════════════════════════════════════════════════════════
+   LANDING PAGE (preserved from original)
+════════════════════════════════════════════════════════ */
+#landing { min-height: 100vh; display: flex; flex-direction: column; background: var(--land-bg); color: var(--land-text); }
+
+.land-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 64px; height: 64px; border-bottom: 1px solid var(--land-border); position: sticky; top: 0; z-index: 100; background: rgba(13,13,11,0.92); backdrop-filter: blur(12px); }
+.land-logo { display: flex; align-items: center; gap: 14px; }
+.land-logo-mark { width: 32px; height: 32px; border: 1px solid var(--land-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.land-logo-mark svg { width: 16px; height: 16px; }
+.land-logo-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--land-text); }
+.land-logo-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--land-text-muted); letter-spacing: 0.12em; text-transform: uppercase; border-left: 1px solid var(--land-border); padding-left: 14px; }
+.land-nav-links { display: flex; align-items: center; gap: 32px; }
+.land-nav-link { font-size: 13px; color: #c8c6c2; text-decoration: none; cursor: pointer; transition: color 0.15s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+.land-nav-link:hover { color: #fff; }
+.land-nav-right { display: flex; align-items: center; gap: 12px; }
+
+.btn-land-ghost { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--land-border); background: transparent; color: var(--land-text-dim); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-land-ghost:hover { border-color: var(--land-accent); color: #fff; }
+.btn-land-primary { padding: 9px 20px; border-radius: 6px; border: none; background: var(--land-accent); color: #141412; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-land-primary:hover { background: var(--accent-mid); }
+
+/* Hero */
+.land-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; padding: 80px 64px; flex: 1; align-items: center; }
+.land-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.eyebrow-line { width: 28px; height: 1px; background: var(--land-accent); }
+.eyebrow-text { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--land-accent); }
+.land-h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; line-height: 1.1; letter-spacing: -1px; margin-bottom: 20px; }
+.land-h1 em { font-style: italic; color: var(--land-accent); }
+.land-sub { font-size: 16px; color: var(--land-text-dim); line-height: 1.7; margin-bottom: 32px; max-width: 520px; font-weight: 300; }
+.land-cta-group { display: flex; gap: 12px; margin-bottom: 48px; }
+.btn-hero-primary { padding: 14px 32px; border-radius: 8px; border: none; background: var(--land-accent); color: #141412; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-hero-primary:hover { background: var(--accent-mid); }
+.btn-hero-ghost { padding: 14px 32px; border-radius: 8px; border: 1px solid var(--land-border); background: transparent; color: var(--land-text-dim); font-size: 15px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-hero-ghost:hover { border-color: var(--land-accent); color: #fff; }
+.land-stats { display: flex; gap: 40px; }
+.land-stat-value { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--land-accent); margin-bottom: 2px; }
+.land-stat-label { font-size: 12px; color: var(--land-text-muted); }
+
+/* Hero right */
+.land-hero-right { position: relative; aspect-ratio: 1; border: 1px solid var(--land-border); border-radius: 12px; overflow: hidden; background: var(--land-surface); }
+.hero-grid-bg { position: absolute; inset: 0; background-image: linear-gradient(var(--land-border) 1px, transparent 1px), linear-gradient(90deg, var(--land-border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.3; }
+.hero-corner { position: absolute; width: 16px; height: 16px; border-color: var(--land-accent); border-style: solid; border-width: 0; }
+.hero-corner.tl { top: 12px; left: 12px; border-top-width: 1px; border-left-width: 1px; }
+.hero-corner.tr { top: 12px; right: 12px; border-top-width: 1px; border-right-width: 1px; }
+.hero-corner.bl { bottom: 12px; left: 12px; border-bottom-width: 1px; border-left-width: 1px; }
+.hero-corner.br { bottom: 12px; right: 12px; border-bottom-width: 1px; border-right-width: 1px; }
+.hero-chart-wrap { position: absolute; inset: 40px; display: flex; align-items: flex-end; }
+.hero-chart-wrap svg { width: 100%; height: 100%; }
+
+/* Features */
+.land-features { padding: 80px 64px; border-top: 1px solid var(--land-border); }
+.land-features-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 48px; }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.feature-card { background: var(--land-surface); border: 1px solid var(--land-border); border-radius: 10px; padding: 32px; transition: border-color 0.2s; }
+.feature-card:hover { border-color: var(--land-accent); }
+.feature-icon { width: 40px; height: 40px; border: 1px solid var(--land-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 18px; }
+.feature-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.feature-desc { font-size: 13px; color: var(--land-text-dim); line-height: 1.6; }
+
+/* Pricing */
+.land-pricing { padding: 80px 64px; border-top: 1px solid var(--land-border); }
+.land-pricing-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; text-align: center; margin-bottom: 12px; }
+.land-pricing-sub { text-align: center; color: var(--land-text-dim); font-size: 15px; margin-bottom: 48px; }
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 960px; margin: 0 auto; }
+.pricing-card { background: var(--land-surface); border: 1px solid var(--land-border); border-radius: 12px; padding: 36px 32px; }
+.pricing-card.featured { border-color: var(--land-accent); position: relative; }
+.pricing-card.featured::before { content: 'POPULAR'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--land-accent); color: #141412; font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 3px; }
+.pricing-name { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--land-text-muted); margin-bottom: 8px; }
+.pricing-price { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; margin-bottom: 4px; }
+.pricing-period { font-size: 13px; color: var(--land-text-muted); margin-bottom: 24px; }
+.pricing-features { list-style: none; margin-bottom: 28px; }
+.pricing-features li { padding: 8px 0; font-size: 13px; color: var(--land-text-dim); border-bottom: 1px solid var(--land-border); display: flex; align-items: center; gap: 8px; }
+.pricing-features li::before { content: '✓'; color: var(--land-accent); font-size: 11px; }
+.pricing-btn { width: 100%; padding: 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.pricing-btn-outline { background: none; border: 1px solid var(--land-border); color: var(--land-text-dim); }
+.pricing-btn-outline:hover { border-color: var(--land-accent); color: #fff; }
+.pricing-btn-primary { background: var(--land-accent); border: none; color: #141412; }
+.pricing-btn-primary:hover { background: var(--accent-mid); }
+
+/* Footer */
+.land-footer { padding: 32px 64px; border-top: 1px solid var(--land-border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--land-text-muted); }
+
+@media (max-width: 900px) {
+  .land-hero { grid-template-columns: 1fr; padding: 48px 24px; }
+  .land-hero-right { display: none; }
+  .land-nav, .land-features, .land-pricing, .land-footer { padding-left: 24px; padding-right: 24px; }
+  .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+  .land-h1 { font-size: 36px; }
+}
+
+/* ════════════════════════════════════════════════════════
+   APP SHELL — Navigation + Page Router
+════════════════════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; }
+
+.app-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 56px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100; background: rgba(13,13,11,0.94); backdrop-filter: blur(12px);
+}
+
+.app-nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+.app-nav-logo-mark { width: 28px; height: 28px; border: 1px solid var(--accent); border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+.app-nav-logo-mark svg { width: 14px; height: 14px; }
+.app-nav-logo-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--text); }
+
+.app-nav-links { display: flex; align-items: center; gap: 6px; }
+.app-nav-link {
+  font-size: 12px; color: var(--text-muted); text-decoration: none; letter-spacing: 0.02em;
+  padding: 6px 14px; border-radius: 5px; transition: all 0.15s; cursor: pointer;
+  background: none; border: none; font-family: 'DM Sans', sans-serif; white-space: nowrap;
+}
+.app-nav-link:hover { color: var(--text); background: var(--accent-light); }
+.app-nav-link.active { color: var(--text); background: var(--accent-light); }
+
+.app-nav-right { display: flex; align-items: center; gap: 12px; }
+.data-source { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; animation: livePulse 2s ease-in-out infinite; }
+@keyframes livePulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+.usage-bar { display: none; align-items: center; gap: 8px; padding: 4px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
+.usage-pips { display: flex; gap: 3px; }
+.usage-pip { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.usage-pip.used { background: var(--accent); }
+
+/* User menu */
+.user-menu { display: flex; align-items: center; gap: 8px; position: relative; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); cursor: pointer; }
+.user-plan-badge { font-family: 'DM Mono', monospace; font-size: 9px; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.06em; }
+.plan-free { background: var(--border); color: var(--text-muted); }
+.plan-pro { background: var(--bull-light); color: var(--bull); }
+.plan-team { background: var(--purple-light); color: var(--purple); }
+
+.user-dropdown { display: none; position: absolute; top: 42px; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; min-width: 200px; padding: 8px; z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+.user-dropdown.open { display: block; }
+.dropdown-email { padding: 10px 12px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.dropdown-item { display: block; width: 100%; padding: 10px 12px; background: none; border: none; text-align: left; font-size: 13px; color: var(--text-secondary); cursor: pointer; border-radius: 4px; font-family: 'DM Sans', sans-serif; transition: background 0.1s; }
+.dropdown-item:hover { background: var(--accent-light); }
+.dropdown-item.danger { color: var(--danger); }
+
+/* API Key Banner */
+.api-banner { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; }
+.api-banner-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+.api-inputs { display: flex; gap: 8px; flex-wrap: wrap; }
+.api-input { flex: 1; min-width: 200px; background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 8px 12px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text); outline: none; }
+.api-input::placeholder { color: var(--text-muted); }
+.btn-sm { padding: 8px 16px; border-radius: 5px; border: none; background: var(--accent); color: #141412; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* Page containers */
+.app-page { display: none; max-width: 1400px; margin: 0 auto; padding: 32px 48px 80px; }
+.app-page.active { display: block; }
+
+/* ════════════════════════════════════════════════════════
+   SHARED COMPONENT STYLES (used across all tools)
+════════════════════════════════════════════════════════ */
+.section-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; margin-bottom: 6px; }
+.section-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 300; }
+.page-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.page-eyebrow-line { width: 24px; height: 1px; background: var(--accent); }
+.page-eyebrow-text { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.page-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.page-subtitle { font-size: 14px; color: var(--text-muted); font-weight: 300; margin-bottom: 32px; }
+
+/* Pro gate overlay */
+.pro-gate { text-align: center; padding: 80px 40px; }
+.pro-gate-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.4; }
+.pro-gate-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text); margin-bottom: 8px; }
+.pro-gate-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto; }
+.pro-gate-btn { background: var(--accent); color: #141412; border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+/* Loading spinner */
+.page-loading { text-align: center; padding: 80px 20px; }
+.loader { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+/* Generic table */
+.data-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { padding: 12px 16px; text-align: right; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.data-table th:first-child { text-align: left; }
+.data-table td { padding: 10px 16px; text-align: right; font-size: 12px; color: var(--text); font-family: 'DM Mono', monospace; border-bottom: 1px solid var(--border); }
+.data-table td:first-child { text-align: left; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+/* KPI grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 28px; }
+.kpi-card { background: var(--surface); padding: 20px; }
+.kpi-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.kpi-value { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text); }
+.kpi-value.positive { color: var(--bull); }
+.kpi-value.negative { color: var(--bear); }
+.kpi-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-family: 'DM Mono', monospace; }
+
+/* Card */
+.tool-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+
+/* Search bar shared */
+.tool-search-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.tool-search-input { flex: 1; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text); outline: none; letter-spacing: 0.05em; }
+.tool-search-input::placeholder { color: var(--text-muted); }
+.tool-search-input:focus { border-color: var(--accent); }
+.tool-btn { background: var(--accent); color: #141412; border: none; border-radius: 6px; padding: 12px 28px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.tool-btn:hover { opacity: 0.88; }
+.tool-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.tool-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+/* Discount badge */
+.discount-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.discount-badge.deep { background: var(--bull-light); color: var(--bull); }
+.discount-badge.moderate { background: var(--base-light); color: var(--base-col); }
+.discount-badge.slight { background: var(--warning-light); color: var(--warning); }
+.discount-badge.over { background: var(--bear-light); color: var(--bear); }
+
+/* Sentiment badge */
+.sentiment-badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
+.sentiment-badge.positive { background: var(--bull-light); color: var(--bull); }
+.sentiment-badge.negative { background: var(--bear-light); color: var(--bear); }
+.sentiment-badge.neutral { background: var(--accent-light); color: var(--text-muted); }
+
+/* ════════════════════════════════════════════════════════
+   MODALS (auth + upgrade)
+════════════════════════════════════════════════════════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(4px); }
+.modal-overlay.visible { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 36px; width: 100%; max-width: 420px; position: relative; }
+.modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+.modal-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 6px; }
+.modal-subtitle { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.modal-tabs { display: flex; gap: 0; background: var(--bg); border-radius: 6px; padding: 3px; margin-bottom: 20px; }
+.modal-tab { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 4px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.modal-tab.active { background: var(--surface); color: var(--text); }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.form-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-size: 13px; color: var(--text); outline: none; font-family: 'DM Sans', sans-serif; }
+.form-input:focus { border-color: var(--accent); }
+.form-btn { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #141412; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
+.form-btn:hover { opacity: 0.88; }
+.form-error { margin-top: 12px; font-size: 12px; color: var(--danger); text-align: center; }
+.upgrade-plans { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.upgrade-plan { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.15s; }
+.upgrade-plan:hover, .upgrade-plan.selected { border-color: var(--accent); }
+.upgrade-plan-name { font-weight: 600; font-size: 15px; }
+.upgrade-plan-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.upgrade-plan-price { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+.upgrade-plan-period { font-size: 11px; color: var(--text-muted); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app-nav { padding: 0 16px; gap: 8px; }
+  .app-nav-links { overflow-x: auto; gap: 2px; }
+  .app-nav-link { padding: 6px 10px; font-size: 11px; }
+  .app-page { padding: 20px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     LANDING PAGE
+════════════════════════════════════════════════════════════ -->
+<div id="landing">
+  <nav class="land-nav">
+    <div class="land-logo">
+      <div class="land-logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b8bcc4" stroke-width="1.5">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+        </svg>
+      </div>
+      <span class="land-logo-name">Financial Foresights</span>
+    </div>
+    <div class="land-nav-links">
+      <button class="land-nav-link" onclick="document.querySelector('.land-features').scrollIntoView({behavior:'smooth'})">Features</button>
+      <button class="land-nav-link" onclick="document.querySelector('.land-pricing').scrollIntoView({behavior:'smooth'})">Pricing</button>
+    </div>
+    <div class="land-nav-right">
+      <button class="btn-land-ghost" onclick="openModal('authModal')">Sign In</button>
+      <button class="btn-land-primary" onclick="enterApp()">Get Started</button>
+    </div>
+  </nav>
+
+  <section class="land-hero">
+    <div class="land-hero-left">
+      <div class="land-eyebrow">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">Look Further. Invest Smarter.</span>
+      </div>
+      <h1 class="land-h1">Look further.<br><em>Invest smarter.</em></h1>
+      <p class="land-sub">Financial Foresights provides investors with an interactive DCF engine, stock reports, real-time screening, strategy backtesting, and AI-powered analysis — all in one platform.</p>
+      <div class="land-cta-group">
+        <button class="btn-hero-primary" onclick="enterApp()">Begin Analysing</button>
+        <button class="btn-hero-ghost" onclick="enterApp()">View Demo →</button>
+      </div>
+      <div class="land-stats">
+        <div><div class="land-stat-value">10K+</div><div class="land-stat-label">Companies covered</div></div>
+        <div><div class="land-stat-value">5</div><div class="land-stat-label">Professional tools</div></div>
+        <div><div class="land-stat-value">Real-time</div><div class="land-stat-label">Live market data</div></div>
+      </div>
+    </div>
+    <div class="land-hero-right">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-corner tl"></div><div class="hero-corner tr"></div><div class="hero-corner bl"></div><div class="hero-corner br"></div>
+      <div class="hero-chart-wrap">
+        <svg viewBox="0 0 400 300" fill="none">
+          <path d="M0 250 Q50 240 80 220 T160 180 T240 120 T320 60 T400 30" stroke="#b8bcc4" stroke-width="2" fill="none" opacity="0.6"/>
+          <path d="M0 260 Q50 250 80 230 T160 200 T240 150 T320 90 T400 50 V300 H0Z" fill="url(#hg)" opacity="0.15"/>
+          <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8bcc4"/><stop offset="1" stop-color="#0d0d0b"/></linearGradient></defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="land-features">
+    <div class="land-features-title">Professional Tools, One Platform</div>
+    <div class="features-grid">
+      <div class="feature-card" onclick="enterApp('#dcf')" style="cursor:pointer">
+        <div class="feature-icon">◇</div>
+        <div class="feature-title">DCF Analyser</div>
+        <div class="feature-desc">Interactive discounted cash flow model with real-time sliders, sensitivity tables, and scenario analysis.</div>
+      </div>
+      <div class="feature-card" onclick="enterApp('#reports')" style="cursor:pointer">
+        <div class="feature-icon">◈</div>
+        <div class="feature-title">Stock Reports</div>
+        <div class="feature-desc">Automated equity research reports with risk/reward analysis, bull/base/bear scenarios, and AI-powered thesis.</div>
+      </div>
+      <div class="feature-card" onclick="enterApp('#screener')" style="cursor:pointer">
+        <div class="feature-icon">▣</div>
+        <div class="feature-title">Stock Screener</div>
+        <div class="feature-desc">Scan the market for undervalued stocks using DCF, P/E, ROE, FCF yield, and other fundamentals.</div>
+      </div>
+      <div class="feature-card" onclick="enterApp('#news')" style="cursor:pointer">
+        <div class="feature-icon">◉</div>
+        <div class="feature-title">Market Pulse</div>
+        <div class="feature-desc">Real-time market news with AI sentiment analysis, market movers, and index tracking.</div>
+      </div>
+      <div class="feature-card" onclick="enterApp('#backtest')" style="cursor:pointer">
+        <div class="feature-icon">△</div>
+        <div class="feature-title">Backtest Lab</div>
+        <div class="feature-desc">Test trading strategies against historical data with equity curves, drawdown analysis, and trade logs.</div>
+      </div>
+      <div class="feature-card" onclick="enterApp('#dcf')" style="cursor:pointer">
+        <div class="feature-icon">✦</div>
+        <div class="feature-title">AI Analysis</div>
+        <div class="feature-desc">AI-powered investment thesis generation with key driver identification, risk flags, and model verdicts.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="land-pricing">
+    <div class="land-pricing-title">Simple, transparent pricing</div>
+    <div class="land-pricing-sub">Start free, upgrade when you're ready</div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">Free</div>
+        <div class="pricing-price">£0</div>
+        <div class="pricing-period">forever</div>
+        <ul class="pricing-features">
+          <li>DCF Analyser (3/day)</li>
+          <li>Stock Reports (3/day)</li>
+          <li>Market News Feed</li>
+          <li>Basic Screener</li>
+        </ul>
+        <button class="pricing-btn pricing-btn-outline" onclick="enterApp()">Get Started</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price">£19</div>
+        <div class="pricing-period">/month</div>
+        <ul class="pricing-features">
+          <li>Unlimited analyses</li>
+          <li>AI-powered insights</li>
+          <li>Full Backtest Lab</li>
+          <li>Advanced Screener</li>
+          <li>Priority data refresh</li>
+        </ul>
+        <button class="pricing-btn pricing-btn-primary" onclick="openModal('upgradeModal')">Upgrade to Pro</button>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name">Team</div>
+        <div class="pricing-price">£49</div>
+        <div class="pricing-period">/month</div>
+        <ul class="pricing-features">
+          <li>Everything in Pro</li>
+          <li>5 team seats</li>
+          <li>Shared watchlists</li>
+          <li>API access</li>
+          <li>Custom reports</li>
+        </ul>
+        <button class="pricing-btn pricing-btn-outline" onclick="openModal('upgradeModal')">Contact Sales</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="land-footer">
+    <div>© 2026 Financial Foresights. All rights reserved.</div>
+    <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--text-secondary);font-weight:600;">Financial Foresights</div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     APP
+════════════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- APP NAV -->
+  <nav class="app-nav">
+    <div class="app-nav-logo" onclick="showLanding()">
+      <div class="app-nav-logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#b8bcc4" stroke-width="1.5"><path d="M3 17l6-8 4 4 8-10"/><path d="M17 3h4v4"/></svg></div>
+      <span class="app-nav-logo-name">Financial Foresights</span>
+    </div>
+    <div class="app-nav-links">
+      <button class="app-nav-link active" data-page="dcf" onclick="navigateTo('dcf')">DCF Analyser</button>
+      <button class="app-nav-link" data-page="reports" onclick="navigateTo('reports')">Stock Reports</button>
+      <button class="app-nav-link" data-page="screener" onclick="navigateTo('screener')">Screener</button>
+      <button class="app-nav-link" data-page="news" onclick="navigateTo('news')">Market Pulse</button>
+      <button class="app-nav-link" data-page="backtest" onclick="navigateTo('backtest')">Backtest Lab</button>
+    </div>
+    <div class="app-nav-right">
+      <span class="data-source"><span class="live-dot"></span> <span id="dataSourceLabel">Demo Data</span></span>
+      <div class="usage-bar" id="usageBar" style="display:none;">
+        <div class="usage-pips" id="usagePips"></div>
+        <span id="usageLabel">0/3 analyses</span>
+      </div>
+      <div id="headerAuth">
+        <button class="btn-land-ghost" style="font-size:12px;padding:6px 14px;" onclick="openModal('authModal')">Sign In</button>
+      </div>
+      <div class="user-menu" id="headerUser" style="display:none;">
+        <span class="user-plan-badge plan-free" id="planBadge">Free</span>
+        <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">U</div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-email" id="dropdownEmail"></div>
+          <button class="dropdown-item" onclick="openModal('upgradeModal')">⬆ Upgrade Plan</button>
+          <button class="dropdown-item" onclick="navigateTo('settings')">⚙ API Settings</button>
+          <button class="dropdown-item" onclick="showLanding()">← Back to Home</button>
+          <button class="dropdown-item danger" onclick="signOut()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- API KEY BANNER (shown when no keys configured) -->
+  <div id="api-banner-container" style="display:none; max-width:1400px; margin:0 auto; padding:16px 48px 0;">
+    <div class="api-banner" id="apiBanner">
+      <div class="api-banner-text"><strong>Connect your API keys</strong> to unlock live data across all tools. Keys are stored locally in your browser.</div>
+      <div class="api-inputs">
+        <input class="api-input" id="fmpKeyInput" type="password" placeholder="FMP API Key (financialmodelingprep.com)">
+        <input class="api-input" id="finnhubKeyInput" type="password" placeholder="Finnhub API Key (finnhub.io)">
+        <button class="btn-sm" onclick="saveKeys()">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ PAGE: DCF ANALYSER ════════ -->
+  <div class="app-page active" id="page-dcf">
+    <div class="page-eyebrow"><div class="page-eyebrow-line"></div><span class="page-eyebrow-text">DCF Analyser</span></div>
+    <div class="page-title">Discounted Cash Flow Model</div>
+    <div class="page-subtitle">Interactive DCF with real-time scenario modelling — adjust assumptions and see valuations update instantly</div>
+    <div id="dcf-tool-mount">
+      <!-- DCF tool will be loaded here. For now, placeholder that links to original -->
+      <div class="tool-search-bar">
+        <input class="tool-search-input" id="dcfTicker" type="text" value="AAPL" placeholder="Enter ticker — AAPL" onkeydown="if(event.key==='Enter') loadDCF()">
+        <button class="tool-btn" onclick="loadDCF()">Analyse →</button>
+      </div>
+      <div class="tool-hint">Enter any US-listed ticker for a full DCF valuation with bull/base/bear scenarios</div>
+      <div id="dcfContent" style="margin-top:24px">
+        <div style="text-align:center;padding:60px;color:var(--text-muted)">Enter a ticker above to begin your DCF analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ PAGE: STOCK REPORTS ════════ -->
+  <div class="app-page" id="page-reports">
+    <div class="page-eyebrow"><div class="page-eyebrow-line"></div><span class="page-eyebrow-text">Equity Research</span></div>
+    <div class="page-title">Stock Reports</div>
+    <div class="page-subtitle">Risk/Reward analysis · DCF valuation · Bull/Base/Bear scenarios · Fundamental breakdown</div>
+    <div class="tool-search-bar">
+      <input class="tool-search-input" id="reportTicker" type="text" placeholder="Enter ticker — AAPL, MSFT, NVDA…" onkeydown="if(event.key==='Enter') generateReport()">
+      <button class="tool-btn" id="reportBtn" onclick="generateReport()">Generate Report</button>
+    </div>
+    <div class="tool-hint">Generates a comprehensive Morgan Stanley-style risk/reward report for any publicly traded stock</div>
+    <div id="reportLoading" class="page-loading" style="display:none"><div class="loader"></div><div class="loading-text" id="reportLoadingText">Fetching data…</div></div>
+    <div id="reportError" style="display:none;margin-top:24px;padding:16px;background:var(--bear-light);border:1px solid rgba(224,85,85,0.25);border-radius:6px;color:var(--bear);font-size:13px;"></div>
+    <div id="reportEmpty" style="text-align:center;padding:60px;color:var(--text-muted)">Enter a ticker above to generate a stock report</div>
+    <div id="reportContent" style="display:none;margin-top:24px;"></div>
+  </div>
+
+  <!-- ════════ PAGE: SCREENER ════════ -->
+  <div class="app-page" id="page-screener">
+    <div class="page-eyebrow"><div class="page-eyebrow-line"></div><span class="page-eyebrow-text">Stock Screener</span></div>
+    <div class="page-title">Undervalued Stock Scanner</div>
+    <div class="page-subtitle">Scans fundamentals, DCF models, and valuation multiples to find stocks trading below intrinsic value</div>
+    <div id="screenerContent"></div>
+  </div>
+
+  <!-- ════════ PAGE: MARKET PULSE ════════ -->
+  <div class="app-page" id="page-news">
+    <div class="page-eyebrow"><div class="page-eyebrow-line"></div><span class="page-eyebrow-text">Market Pulse</span></div>
+    <div class="page-title">Market News</div>
+    <div class="page-subtitle">Real-time financial news with sentiment analysis</div>
+    <div id="newsContent"></div>
+  </div>
+
+  <!-- ════════ PAGE: BACKTEST LAB ════════ -->
+  <div class="app-page" id="page-backtest">
+    <div class="page-eyebrow"><div class="page-eyebrow-line"></div><span class="page-eyebrow-text">Backtest Lab</span></div>
+    <div class="page-title">Strategy Backtester</div>
+    <div class="page-subtitle">Test trading strategies against historical data with real performance metrics</div>
+    <div id="backtestContent"></div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     AUTH MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    <div class="modal-logo">Financial Foresights</div>
+    <div class="modal-subtitle">Sign in to access your account</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="modal-tab" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+    <div id="signinForm">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="authEmail" type="email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="authPassword" type="password" placeholder="••••••••">
+      </div>
+      <button class="form-btn" id="authSubmitBtn" onclick="handleAuth()">Sign In</button>
+      <div class="form-error" id="authError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     UPGRADE MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('upgradeModal')">×</button>
+    <div class="modal-logo">Upgrade Your Plan</div>
+    <div class="modal-subtitle">Unlock AI analysis and unlimited access</div>
+    <div class="upgrade-plans">
+      <div class="upgrade-plan selected" id="planPro" onclick="selectPlan('pro')">
+        <div><div class="upgrade-plan-name">Pro</div><div class="upgrade-plan-desc">Unlimited analyses · AI insights · Backtest Lab · Full Screener</div></div>
+        <div style="text-align:right;"><div class="upgrade-plan-price">£19</div><div class="upgrade-plan-period">/month</div></div>
+      </div>
+      <div class="upgrade-plan" id="planTeam" onclick="selectPlan('team')">
+        <div><div class="upgrade-plan-name">Team</div><div class="upgrade-plan-desc">5 seats · Shared watchlists · API access · Custom reports</div></div>
+        <div style="text-align:right;"><div class="upgrade-plan-price">£49</div><div class="upgrade-plan-period">/month</div></div>
+      </div>
+    </div>
+    <button class="form-btn" onclick="handleUpgrade()">Continue to Payment →</button>
+    <div class="form-error" id="upgradeError"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     JAVASCRIPT — Core Platform + All Tools
+════════════════════════════════════════════════════════════ -->
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG — Replace with your real keys
+// ═══════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://gpznogwtpakvlmhouuwg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdwem5vZ3d0cGFrdmxtaG91dXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDAwMzEsImV4cCI6MjA4NzI3NjAzMX0.dAb6g5xzWg3PcJ-oWxn_P4thEyrHn0tTvAcA7H0-dm0';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51T3LygDNXtDSAjJ8SefuLJbcIqeviyBJuOy1Oh4Mwxe1hB1wIJyqf8za3ACFxhPxLxxHpWZinIwDT6IBaqtyYs7k007iFNRbHE';
+const STRIPE_PRO_PRICE_ID = 'price_1T3M4BDNXtDSAjJ80HyditBB';
+const STRIPE_TEAM_PRICE_ID = 'price_1T3M4iDNXtDSAjJ8t1038D1j';
+
+// API keys (loaded from localStorage or user input)
+let FMP_KEY = localStorage.getItem('ff_fmp_key') || '';
+let FINNHUB_KEY = localStorage.getItem('ff_finnhub_key') || '';
+let CLAUDE_KEY = localStorage.getItem('ff_claude_key') || '';
+
+const FMP = 'https://financialmodelingprep.com/stable';
+const FINNHUB = 'https://finnhub.io/api/v1';
+
+// ═══════════════════════════════════════════════════════════
+// SUPABASE + STRIPE INIT
+// ═══════════════════════════════════════════════════════════
+let _supabase, _stripe;
+try {
+  _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch(e) { console.warn('Supabase init skipped:', e.message); }
+try {
+  _stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+} catch(e) { console.warn('Stripe init skipped:', e.message); }
+
+let currentUser = null;
+let currentPlan = 'free';
+let analysesUsedToday = 0;
+const FREE_LIMIT = 3;
+let selectedUpgradePlan = 'pro';
+let authMode = 'signin';
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION + ROUTING
+// ═══════════════════════════════════════════════════════════
+const PAGES = ['dcf', 'reports', 'screener', 'news', 'backtest'];
+let currentPage = 'dcf';
+
+function enterApp(hash) {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initAPIBanner();
+  if (hash) {
+    const page = hash.replace('#', '');
+    if (PAGES.includes(page)) navigateTo(page);
+  }
+}
+
+function showLanding() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+  toggleDropdown(true);
+}
+
+function navigateTo(page) {
+  if (!PAGES.includes(page)) page = 'dcf';
+  currentPage = page;
+  window.location.hash = page;
+
+  // Update nav
+  document.querySelectorAll('.app-nav-link').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+
+  // Show/hide pages
+  document.querySelectorAll('.app-page').forEach(el => {
+    el.classList.toggle('active', el.id === `page-${page}`);
+  });
+  // Show API banner if no FMP key
+  document.getElementById('api-banner-container').style.display = FMP_KEY ? 'none' : 'block';
+
+  // Lazy-load page content on first visit
+  initPage(page);
+}
+
+// Handle hash changes (back/forward)
+window.addEventListener('hashchange', () => {
+  const page = window.location.hash.replace('#', '');
+  if (PAGES.includes(page) && page !== currentPage) navigateTo(page);
+});
+
+// On load, check hash
+window.addEventListener('load', () => {
+  const hash = window.location.hash.replace('#', '');
+  if (PAGES.includes(hash)) {
+    enterApp('#' + hash);
+  }
+
+  // Restore API keys from localStorage
+  if (FMP_KEY) {
+    document.getElementById('fmpKeyInput').value = FMP_KEY;
+    document.getElementById('dataSourceLabel').textContent = 'Live Data · FMP';
+  }
+  if (FINNHUB_KEY) document.getElementById('finnhubKeyInput').value = FINNHUB_KEY;
+});
+
+// Track which pages have been initialized
+const pageInit = {};
+function initPage(page) {
+  if (pageInit[page]) return;
+  pageInit[page] = true;
+  // Each page's lazy init
+  if (page === 'screener') initScreener();
+  if (page === 'news') initNewsFeed();
+  if (page === 'backtest') initBacktestLab();
+}
+
+// ═══════════════════════════════════════════════════════════
+// API KEY MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function initAPIBanner() {
+  const banner = document.getElementById('api-banner-container');
+  banner.style.display = FMP_KEY ? 'none' : 'block';
+}
+
+function saveKeys() {
+  const fmp = document.getElementById('fmpKeyInput').value.trim();
+  const finnhub = document.getElementById('finnhubKeyInput').value.trim();
+
+  if (fmp) { FMP_KEY = fmp; localStorage.setItem('ff_fmp_key', fmp); }
+  if (finnhub) { FINNHUB_KEY = finnhub; localStorage.setItem('ff_finnhub_key', finnhub); }
+
+  if (FMP_KEY) {
+    document.getElementById('dataSourceLabel').textContent = 'Testing FMP key…';
+    // Validate the key with a simple profile call
+    fetch(`${FMP}/profile?symbol=AAPL&apikey=${FMP_KEY}`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data) && data[0] && (data[0].companyName || data[0].symbol)) {
+          document.getElementById('dataSourceLabel').textContent = 'Live Data · FMP ✓';
+          document.getElementById('api-banner-container').style.display = 'none';
+        } else if (data && data['Error Message']) {
+          document.getElementById('dataSourceLabel').textContent = 'FMP Key Error';
+          alert('FMP API responded with: ' + data['Error Message']);
+        } else {
+          document.getElementById('dataSourceLabel').textContent = 'FMP Key Error';
+          alert('FMP API returned unexpected data: ' + JSON.stringify(data).slice(0, 300));
+        }
+      })
+      .catch(err => {
+        document.getElementById('dataSourceLabel').textContent = 'FMP Connection Failed';
+        alert('Could not reach FMP API: ' + err.message);
+      });
+  }
+
+  // Reset page inits so they reload with new keys, then re-init current page
+  Object.keys(pageInit).forEach(k => pageInit[k] = false);
+  initPage(currentPage);
+}
+
+// Helper: FMP fetch with detailed error handling
+async function fmpFetch(endpoint) {
+  if (!FMP_KEY) throw new Error('FMP API key required. Add it in the banner above.');
+  const sep = endpoint.includes('?') ? '&' : '?';
+  const url = `${FMP}${endpoint}${sep}apikey=${FMP_KEY}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`FMP API error ${res.status}: ${text.slice(0, 200) || res.statusText}`);
+    }
+    const data = await res.json();
+    // FMP sometimes returns error messages as JSON
+    if (data && data['Error Message']) throw new Error('FMP: ' + data['Error Message']);
+    return data;
+  } catch(err) {
+    if (err.message.includes('FMP')) throw err;
+    throw new Error('Network error reaching FMP API: ' + err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('visible'); }
+function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', (mode === 'signin' && i === 0) || (mode === 'signup' && i === 1)));
+  document.getElementById('authSubmitBtn').textContent = mode === 'signin' ? 'Sign In' : 'Create Account';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  const btn = document.getElementById('authSubmitBtn');
+  if (!email || !password) { errEl.textContent = 'Please enter email and password.'; return; }
+  btn.disabled = true;
+  btn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+  errEl.textContent = '';
+  let result;
+  if (!_supabase) { errEl.textContent = 'Authentication service not available.'; btn.disabled = false; btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account'; return; }
+  if (authMode === 'signin') result = await _supabase.auth.signInWithPassword({ email, password });
+  else result = await _supabase.auth.signUp({ email, password });
+  btn.disabled = false;
+  btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+  if (result.error) { errEl.textContent = result.error.message; return; }
+  if (authMode === 'signup' && !result.data.session) { errEl.style.color = '#3dba80'; errEl.textContent = 'Account created — check your email to confirm.'; return; }
+  closeModal('authModal');
+}
+
+async function onSignedIn(user) {
+  currentUser = user;
+  currentPlan = user.user_metadata?.plan || 'free';
+  const today = new Date().toISOString().slice(0, 10);
+  analysesUsedToday = parseInt(localStorage.getItem(`ff_usage_${user.id}_${today}`) || '0');
+  updateHeaderForUser(user);
+}
+
+function onSignedOut() {
+  currentUser = null;
+  currentPlan = 'free';
+  document.getElementById('headerAuth').style.display = 'flex';
+  document.getElementById('headerUser').style.display = 'none';
+}
+
+async function signOut() { if (_supabase) await _supabase.auth.signOut(); toggleDropdown(true); onSignedOut(); }
+
+function updateHeaderForUser(user) {
+  document.getElementById('headerAuth').style.display = 'none';
+  document.getElementById('headerUser').style.display = 'flex';
+  document.getElementById('userAvatar').textContent = (user.email || 'U')[0].toUpperCase();
+  document.getElementById('dropdownEmail').textContent = user.email;
+  const badge = document.getElementById('planBadge');
+  badge.textContent = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+  badge.className = 'user-plan-badge plan-' + currentPlan;
+}
+
+function toggleDropdown(forceClose = false) {
+  const dd = document.getElementById('userDropdown');
+  if (forceClose) { dd.classList.remove('open'); return; }
+  dd.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  const dd = document.getElementById('userDropdown');
+  const av = document.getElementById('userAvatar');
+  if (dd && !dd.contains(e.target) && e.target !== av) dd.classList.remove('open');
+});
+
+function isPro() { return currentPlan === 'pro' || currentPlan === 'team'; }
+function canUse() { return isPro() || analysesUsedToday < FREE_LIMIT; }
+function incrementUsage() {
+  if (isPro()) return;
+  analysesUsedToday++;
+  const today = new Date().toISOString().slice(0, 10);
+  if (currentUser) localStorage.setItem(`ff_usage_${currentUser.id}_${today}`, analysesUsedToday.toString());
+}
+
+function selectPlan(plan) {
+  selectedUpgradePlan = plan;
+  document.getElementById('planPro').classList.toggle('selected', plan === 'pro');
+  document.getElementById('planTeam').classList.toggle('selected', plan === 'team');
+}
+
+async function handleUpgrade() {
+  if (!currentUser) { closeModal('upgradeModal'); openModal('authModal'); return; }
+  const errEl = document.getElementById('upgradeError');
+  errEl.textContent = '';
+  const priceId = selectedUpgradePlan === 'pro' ? STRIPE_PRO_PRICE_ID : STRIPE_TEAM_PRICE_ID;
+  try {
+    if (!_supabase) throw new Error('Payment service not available.');
+    const { data, error } = await _supabase.functions.invoke('create-checkout', {
+      body: { priceId, userId: currentUser.id, email: currentUser.email, successUrl: window.location.origin + '?upgraded=true', cancelUrl: window.location.origin }
+    });
+    if (error || !data?.url) throw new Error(error?.message || 'Could not create checkout session.');
+    window.location.href = data.url;
+  } catch (err) { errEl.textContent = err.message; }
+}
+
+// Auth listener
+window.addEventListener('load', async () => {
+  if (!_supabase) return;
+  try {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) await onSignedIn(session.user);
+    _supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) await onSignedIn(session.user);
+      else if (event === 'SIGNED_OUT') onSignedOut();
+    });
+  } catch(e) { console.warn('Auth check skipped:', e.message); }
+  // Stripe return
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('upgraded') === 'true') {
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => { if (currentUser) alert('Payment successful — your plan has been upgraded!'); }, 1500);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+const fmt = (n, d = 2) => n == null || isNaN(n) ? '—' : n.toFixed(d);
+const fmtB = (n) => { if (!n || isNaN(n)) return '—'; const a = Math.abs(n); if (a >= 1e12) return (n/1e12).toFixed(2)+'T'; if (a >= 1e9) return (n/1e9).toFixed(1)+'B'; if (a >= 1e6) return (n/1e6).toFixed(0)+'M'; if (a >= 1e3) return (n/1e3).toFixed(1)+'K'; return n.toFixed(0); };
+const fmtPct = (n) => n == null || isNaN(n) ? '—' : (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+const fmtDollar = (n) => n == null || isNaN(n) ? '—' : '$' + n.toFixed(2);
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+function escapeHtml(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function timeAgo(ts) { const d = Date.now() - ts; const m = Math.floor(d/60000); if (m < 1) return 'now'; if (m < 60) return m+'m ago'; const h = Math.floor(m/60); if (h < 24) return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+
+// S&P 500 median multiples
+const SP500 = { pe: 21.5, evEbitda: 15.0, pbv: 4.0, ps: 2.8, divYield: 1.5, roe: 18.0, grossMargin: 45.0, debtEquity: 1.2 };
+
+// Sector P/E ranges
+const SECTOR_MULT = {
+  'Technology': { bearPE: 18, basePE: 28, bullPE: 38, bearEV: 12, baseEV: 20, bullEV: 28 },
+  'Healthcare': { bearPE: 12, basePE: 18, bullPE: 24, bearEV: 10, baseEV: 15, bullEV: 20 },
+  'Financial Services': { bearPE: 8, basePE: 12, bullPE: 16, bearEV: 6, baseEV: 10, bullEV: 14 },
+  'Consumer Cyclical': { bearPE: 12, basePE: 20, bullPE: 28, bearEV: 8, baseEV: 14, bullEV: 20 },
+  'Consumer Defensive': { bearPE: 15, basePE: 22, bullPE: 28, bearEV: 10, baseEV: 15, bullEV: 20 },
+  'Industrials': { bearPE: 12, basePE: 18, bullPE: 24, bearEV: 8, baseEV: 13, bullEV: 18 },
+  'Energy': { bearPE: 6, basePE: 10, bullPE: 15, bearEV: 4, baseEV: 7, bullEV: 10 },
+  'Utilities': { bearPE: 12, basePE: 17, bullPE: 22, bearEV: 8, baseEV: 12, bullEV: 16 },
+  'Real Estate': { bearPE: 15, basePE: 25, bullPE: 35, bearEV: 12, baseEV: 18, bullEV: 24 },
+  'Basic Materials': { bearPE: 10, basePE: 16, bullPE: 22, bearEV: 6, baseEV: 10, bullEV: 14 },
+  'Communication Services': { bearPE: 12, basePE: 20, bullPE: 28, bearEV: 8, baseEV: 14, bullEV: 20 },
+};
+const DEFAULT_MULT = { bearPE: 12, basePE: 18, bullPE: 26, bearEV: 8, baseEV: 13, bullEV: 18 };
+
+// ═══════════════════════════════════════════════════════════
+// PAGE: DCF ANALYSER (simplified - connects to FMP)
+// ═══════════════════════════════════════════════════════════
+async function loadDCF() {
+  const ticker = document.getElementById('dcfTicker').value.trim().toUpperCase();
+  if (!ticker) return;
+  const content = document.getElementById('dcfContent');
+  content.innerHTML = '<div class="page-loading"><div class="loader"></div><div class="loading-text">Loading DCF data…</div></div>';
+  try {
+    const [profile, dcf, income, ratios] = await Promise.all([
+      fmpFetch(`/profile?symbol=${ticker}`),
+      fmpFetch(`/discounted-cash-flow?symbol=${ticker}`),
+      fmpFetch(`/income-statement?symbol=${ticker}&limit=1`),
+      fmpFetch(`/ratios?symbol=${ticker}&limit=1`),
+    ]);
+    if (!profile?.[0]) throw new Error('No data found for ' + ticker);
+    const p = profile[0], d = dcf?.[0], inc = income?.[0], r = ratios?.[0];
+    const dcfVal = d?.dcf || 0;
+    const price = p.price;
+    const upside = price > 0 ? ((dcfVal - price) / price * 100) : 0;
+    content.innerHTML = `
+      <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="kpi-card"><div class="kpi-label">Company</div><div class="kpi-value" style="font-size:16px">${p.companyName}</div><div class="kpi-sub">${p.sector}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Current Price</div><div class="kpi-value">${fmtDollar(price)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">DCF Fair Value</div><div class="kpi-value">${fmtDollar(dcfVal)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Upside / Downside</div><div class="kpi-value ${upside >= 0 ? 'positive' : 'negative'}">${fmtPct(upside)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Market Cap</div><div class="kpi-value" style="font-size:16px">$${fmtB(p.mktCap)}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div class="tool-card">
+          <div class="kpi-label" style="margin-bottom:16px">KEY FINANCIALS</div>
+          <table class="data-table" style="background:transparent">
+            <tr><td style="text-align:left;color:var(--text-secondary)">Revenue (TTM)</td><td>$${fmtB(inc?.revenue)}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">Net Income</td><td>$${fmtB(inc?.netIncome)}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">EPS (Diluted)</td><td>${fmtDollar(inc?.epsdiluted)}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">Gross Margin</td><td>${r?.grossProfitMargin ? fmt(r.grossProfitMargin*100,1)+'%' : '—'}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">Net Margin</td><td>${r?.netProfitMargin ? fmt(r.netProfitMargin*100,1)+'%' : '—'}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">ROE</td><td>${r?.returnOnEquity ? fmt(r.returnOnEquity*100,1)+'%' : '—'}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">P/E Ratio</td><td>${r?.priceEarningsRatio ? fmt(r.priceEarningsRatio,1)+'x' : '—'}</td></tr>
+            <tr><td style="text-align:left;color:var(--text-secondary)">Debt/Equity</td><td>${r?.debtEquityRatio ? fmt(r.debtEquityRatio,2) : '—'}</td></tr>
+          </table>
+        </div>
+        <div class="tool-card">
+          <div class="kpi-label" style="margin-bottom:16px">VALUATION ASSESSMENT</div>
+          <div style="text-align:center;padding:24px 0">
+            <div style="font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:${upside >= 0 ? 'var(--bull)' : 'var(--bear)'}">${fmtDollar(dcfVal)}</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:8px">DCF Intrinsic Value</div>
+            <div style="margin-top:16px;display:inline-block;padding:6px 16px;border-radius:4px;font-size:13px;font-weight:600;${upside >= 15 ? 'background:var(--bull-light);color:var(--bull)' : upside >= -5 ? 'background:var(--base-light);color:var(--base-col)' : 'background:var(--bear-light);color:var(--bear)'}">
+              ${upside >= 15 ? 'UNDERVALUED' : upside >= -5 ? 'FAIR VALUE' : 'OVERVALUED'} · ${fmtPct(upside)}
+            </div>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);text-align:center">
+            DCF value sourced from Financial Modeling Prep
+          </div>
+        </div>
+      </div>`;
+    incrementUsage();
+  } catch (err) {
+    content.innerHTML = `<div style="padding:40px;text-align:center"><div style="color:var(--bear);font-size:14px;margin-bottom:12px">${err.message}</div><div style="font-size:11px;color:var(--text-muted)">Check that your FMP API key is valid at financialmodelingprep.com/developer/docs</div></div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAGE: STOCK REPORTS
+// Full valuation engine included inline
+// ═══════════════════════════════════════════════════════════
+let reportData = null;
+
+async function generateReport() {
+  const ticker = document.getElementById('reportTicker').value.trim().toUpperCase();
+  if (!ticker) return;
+
+  document.getElementById('reportEmpty').style.display = 'none';
+  document.getElementById('reportContent').style.display = 'none';
+  document.getElementById('reportError').style.display = 'none';
+  document.getElementById('reportLoading').style.display = 'block';
+  document.getElementById('reportBtn').disabled = true;
+
+  try {
+    document.getElementById('reportLoadingText').textContent = 'Fetching financial data…';
+    const [profile, incomeAnnual, ratios, keyMetrics, quote, estimates, dcfApi] = await Promise.all([
+      fmpFetch(`/profile?symbol=${ticker}`),
+      fmpFetch(`/income-statement?symbol=${ticker}&limit=4`),
+      fmpFetch(`/ratios?symbol=${ticker}&limit=4`),
+      fmpFetch(`/key-metrics?symbol=${ticker}&limit=4`),
+      fmpFetch(`/quote?symbol=${ticker}`),
+      fmpFetch(`/analyst-estimates?symbol=${ticker}&limit=4`).catch(() => []),
+      fmpFetch(`/discounted-cash-flow?symbol=${ticker}`).catch(() => []),
+    ]);
+
+    if (!profile?.[0]) throw new Error(`No data found for "${ticker}".`);
+
+    document.getElementById('reportLoadingText').textContent = 'Running valuation models…';
+    await sleep(200);
+
+    const p = profile[0], q = quote?.[0] || {}, income = incomeAnnual.slice(0,4).reverse();
+    const latestIncome = incomeAnnual[0] || {}, latestRatios = ratios[0] || {}, latestMetrics = keyMetrics[0] || {};
+    const currentPrice = q.price || p.price;
+    const mults = SECTOR_MULT[p.sector] || DEFAULT_MULT;
+    const currentEPS = latestIncome.epsdiluted || 0;
+    let fwdEPS = estimates?.[0]?.estimatedEpsAvg || currentEPS * 1.08;
+    const marketCap = q.marketCap || p.mktCap;
+    const totalDebt = 0, cashAndEquiv = 0; // simplified
+    const sharesOut = latestIncome.weightedAverageShsOutDil || marketCap / currentPrice;
+    const ebitdaMargin = latestIncome.revenue > 0 ? (latestIncome.ebitda || 0) / latestIncome.revenue : 0.15;
+    const fwdRevenue = estimates?.[0]?.estimatedRevenueAvg || latestIncome.revenue * 1.06;
+    const fwdEBITDA = fwdRevenue * ebitdaMargin;
+
+    // Scenarios
+    let bullPrice = fwdEPS * mults.bullPE * 0.55 + (fwdEBITDA * mults.bullEV / sharesOut) * 0.45;
+    let basePrice = fwdEPS * mults.basePE * 0.55 + (fwdEBITDA * mults.baseEV / sharesOut) * 0.45;
+    let bearPrice = fwdEPS * mults.bearPE * 0.55 + (fwdEBITDA * mults.bearEV / sharesOut) * 0.45;
+    const dcfValue = dcfApi?.[0]?.dcf || null;
+    if (dcfValue > 0) { bullPrice = bullPrice * 0.65 + dcfValue * 1.2 * 0.35; basePrice = basePrice * 0.65 + dcfValue * 0.35; bearPrice = bearPrice * 0.65 + dcfValue * 0.8 * 0.35; }
+    bullPrice = Math.max(bullPrice, currentPrice * 0.95); bearPrice = Math.max(bearPrice, currentPrice * 0.3); basePrice = Math.max(basePrice, bearPrice * 1.05); basePrice = Math.min(basePrice, bullPrice * 0.95);
+
+    const upside = ((basePrice - currentPrice) / currentPrice) * 100;
+    const rating = upside > 15 ? 'OVERWEIGHT' : upside > -5 ? 'EQUAL-WEIGHT' : 'UNDERWEIGHT';
+    const ratingClass = upside > 15 ? 'bull' : upside > -5 ? 'base' : 'bear';
+
+    reportData = { ticker, p, q, currentPrice, basePrice, bullPrice, bearPrice, upside, rating, fwdEPS, latestRatios, latestMetrics, dcfValue };
+
+    document.getElementById('reportLoadingText').textContent = 'Building report…';
+    await sleep(200);
+
+    // Render report
+    const rc = document.getElementById('reportContent');
+    rc.innerHTML = buildReportHTML(p, q, currentPrice, basePrice, bullPrice, bearPrice, upside, rating, ratingClass, mults, fwdEPS, income, estimates, latestRatios, latestMetrics, dcfValue);
+    document.getElementById('reportLoading').style.display = 'none';
+    rc.style.display = 'block';
+    incrementUsage();
+
+  } catch (err) {
+    document.getElementById('reportLoading').style.display = 'none';
+    const errEl = document.getElementById('reportError');
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    document.getElementById('reportBtn').disabled = false;
+  }
+}
+
+function buildReportHTML(p, q, price, base, bull, bear, upside, rating, rClass, mults, fwdEPS, income, estimates, ratios, metrics, dcfVal) {
+  const change = q.changesPercentage || 0;
+  const bullRet = ((bull-price)/price)*100, baseRet = ((base-price)/price)*100, bearRet = ((bear-price)/price)*100;
+  const ratingColors = { bull: 'var(--bull)', base: 'var(--base-col)', bear: 'var(--bear)' };
+  const ratingBg = { bull: 'var(--bull-light)', base: 'var(--base-light)', bear: 'var(--bear-light)' };
+
+  // Financial table
+  const years = income.map(i => i.calendarYear || '—');
+  if (estimates?.[0]) years.push((estimates[0].date?.slice(0,4)||'Fwd')+'e');
+  const finRows = [
+    ['Revenue', ...income.map(i => '$'+fmtB(i.revenue)), estimates?.[0] ? '$'+fmtB(estimates[0].estimatedRevenueAvg) : '—'],
+    ['Net Income', ...income.map(i => '$'+fmtB(i.netIncome)), estimates?.[0] ? '$'+fmtB(estimates[0].estimatedNetIncomeAvg) : '—'],
+    ['EPS', ...income.map(i => fmtDollar(i.epsdiluted)), estimates?.[0] ? fmtDollar(estimates[0].estimatedEpsAvg) : '—'],
+    ['Gross Margin', ...income.map(i => i.revenue ? fmt(i.grossProfit/i.revenue*100,1)+'%' : '—'), '—'],
+  ];
+
+  return `
+    <div style="padding-bottom:32px;border-bottom:1px solid var(--border);margin-bottom:32px">
+      <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700">${p.companyName} <span style="font-family:'DM Mono',monospace;font-size:14px;color:var(--text-muted);margin-left:12px">${p.symbol} · ${p.exchangeShortName||''}</span></div>
+      <div style="display:flex;gap:24px;margin-top:8px;font-size:12px;color:var(--text-secondary)">
+        <span><span style="color:var(--text-muted)">Sector</span> ${p.sector}</span>
+        <span><span style="color:var(--text-muted)">Industry</span> ${p.industry}</span>
+        <span><span style="color:var(--text-muted)">Mkt Cap</span> $${fmtB(p.mktCap)}</span>
+        <span><span style="color:var(--text-muted)">Date</span> ${new Date().toLocaleDateString()}</span>
+      </div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px">
+      <div class="kpi-card"><div class="kpi-label">Current Price</div><div class="kpi-value">${fmtDollar(price)}</div><div class="kpi-sub ${change>=0?'positive':'negative'}" style="color:${change>=0?'var(--bull)':'var(--bear)'}">${fmtPct(change)} today</div></div>
+      <div class="kpi-card"><div class="kpi-label">FF Price Target</div><div class="kpi-value">${fmtDollar(base)}</div><div class="kpi-sub" style="color:${upside>=0?'var(--bull)':'var(--bear)'}">${fmtPct(upside)} upside</div></div>
+      <div class="kpi-card"><div class="kpi-label">FF Rating</div><div style="margin-top:4px"><span style="display:inline-block;padding:6px 16px;border-radius:4px;font-size:13px;font-weight:600;background:${ratingBg[rClass]};color:${ratingColors[rClass]}">${rating}</span></div></div>
+    </div>
+
+    <div class="section-title">Bull / Base / Bear Scenarios</div>
+    <div class="section-subtitle">12-month price targets using sector-appropriate multiples</div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px">
+      <div class="kpi-card" style="border-top:2px solid var(--bull)"><div class="kpi-label" style="color:var(--bull)">Bull Case</div><div class="kpi-value">${fmtDollar(bull)}</div><div class="kpi-sub" style="color:var(--bull)">${fmtPct(bullRet)}</div><div style="margin-top:8px;font-size:11px;color:var(--text-muted)">${mults.bullPE}x P/E · ${mults.bullEV}x EV/EBITDA</div></div>
+      <div class="kpi-card" style="border-top:2px solid var(--base-col)"><div class="kpi-label" style="color:var(--base-col)">Base Case</div><div class="kpi-value">${fmtDollar(base)}</div><div class="kpi-sub" style="color:var(--base-col)">${fmtPct(baseRet)}</div><div style="margin-top:8px;font-size:11px;color:var(--text-muted)">${mults.basePE}x P/E · ${mults.baseEV}x EV/EBITDA</div></div>
+      <div class="kpi-card" style="border-top:2px solid var(--bear)"><div class="kpi-label" style="color:var(--bear)">Bear Case</div><div class="kpi-value">${fmtDollar(bear)}</div><div class="kpi-sub" style="color:var(--bear)">${fmtPct(bearRet)}</div><div style="margin-top:8px;font-size:11px;color:var(--text-muted)">${mults.bearPE}x P/E · ${mults.bearEV}x EV/EBITDA</div></div>
+    </div>
+
+    <div class="section-title">Key Financial Data</div>
+    <div class="section-subtitle">Historical and projected earnings metrics</div>
+    <div class="data-table-wrap" style="margin-bottom:32px">
+      <table class="data-table">
+        <thead><tr><th style="text-align:left">Metric</th>${years.map(y=>`<th>${y}</th>`).join('')}</tr></thead>
+        <tbody>${finRows.map(row=>`<tr>${row.map((c,i)=>`<td${i===0?' style="text-align:left;color:var(--text-secondary);font-family:DM Sans,sans-serif"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+
+    ${dcfVal ? `
+    <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:32px">
+      <div class="kpi-card"><div class="kpi-label">DCF Intrinsic Value</div><div class="kpi-value">${fmtDollar(dcfVal)}</div><div class="kpi-sub">${dcfVal > price ? 'Trading below intrinsic value' : 'Trading above intrinsic value'}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Key Valuation Ratios</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><div style="font-size:10px;color:var(--text-muted)">P/E</div><div style="font-family:'DM Mono',monospace;font-size:14px">${ratios.priceEarningsRatio?fmt(ratios.priceEarningsRatio,1)+'x':'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">EV/EBITDA</div><div style="font-family:'DM Mono',monospace;font-size:14px">${metrics.enterpriseValueOverEBITDA?fmt(metrics.enterpriseValueOverEBITDA,1)+'x':'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">P/B</div><div style="font-family:'DM Mono',monospace;font-size:14px">${ratios.priceToBookRatio?fmt(ratios.priceToBookRatio,1)+'x':'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">Div Yield</div><div style="font-family:'DM Mono',monospace;font-size:14px">${ratios.dividendYield?fmt(ratios.dividendYield*100,1)+'%':'—'}</div></div>
+      </div></div>
+    </div>` : ''}
+
+    <div style="margin-top:32px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--text-muted);line-height:1.7">
+      <strong>Disclaimer:</strong> This report is generated algorithmically for informational purposes only. It does not constitute investment advice. All projections use mathematical models on public data. Past performance is not indicative of future results. Report generated ${new Date().toLocaleString()}.
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAGE: SCREENER (lazy-loaded)
+// ═══════════════════════════════════════════════════════════
+function initScreener() {
+  document.getElementById('screenerContent').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:24px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="kpi-label">Sector</span><select class="tool-search-input" id="scSector" style="max-width:180px;font-size:12px;padding:8px"><option value="">All Sectors</option><option>Technology</option><option>Healthcare</option><option>Financial Services</option><option>Consumer Cyclical</option><option>Industrials</option><option>Energy</option></select></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="kpi-label">Min Discount %</span><input class="tool-search-input" id="scDiscount" type="number" value="10" style="max-width:100px;font-size:12px;padding:8px"></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="kpi-label">Max P/E</span><input class="tool-search-input" id="scMaxPE" type="number" value="30" style="max-width:100px;font-size:12px;padding:8px"></div>
+      <button class="tool-btn" onclick="runScreener()" id="scBtn">Scan Stocks</button>
+    </div>
+    <div id="scLoading" style="display:none" class="page-loading"><div class="loader"></div><div class="loading-text" id="scLoadingText">Scanning…</div></div>
+    <div id="scResults"></div>`;
+}
+
+async function runScreener() {
+  const btn = document.getElementById('scBtn'); btn.disabled = true;
+  document.getElementById('scLoading').style.display = 'block';
+  document.getElementById('scResults').innerHTML = '';
+  const sector = document.getElementById('scSector').value;
+  const minDisc = parseFloat(document.getElementById('scDiscount').value) || 0;
+  const maxPE = parseFloat(document.getElementById('scMaxPE').value) || 999;
+
+  try {
+    document.getElementById('scLoadingText').textContent = 'Fetching stock universe…';
+    let url = `/company-screener?limit=100&isActivelyTrading=true&isEtf=false&isFund=false&country=US&marketCapMoreThan=2000000000`;
+    if (sector) url += `&sector=${encodeURIComponent(sector)}`;
+    const stocks = await fmpFetch(url);
+    if (!stocks?.length) throw new Error('No stocks found.');
+
+    document.getElementById('scLoadingText').textContent = `Fetching DCF for ${stocks.length} stocks…`;
+    const tickers = stocks.map(s => s.symbol).slice(0, 60);
+    let dcfMap = {};
+    for (let i = 0; i < tickers.length; i += 5) {
+      const batch = tickers.slice(i, i+5);
+      for (const sym of batch) {
+        try { const d = await fmpFetch(`/discounted-cash-flow?symbol=${sym}`); if (Array.isArray(d) && d[0]) dcfMap[d[0].symbol] = d[0].dcf; } catch(e){}
+      }
+      document.getElementById('scLoadingText').textContent = `DCF values: ${Math.min(i+5,tickers.length)}/${tickers.length}`;
+    }
+
+    const results = [];
+    for (const s of stocks) {
+      const dcf = dcfMap[s.symbol]; if (!dcf || !s.price || s.price <= 0 || dcf <= 0) continue;
+      const disc = ((dcf - s.price) / s.price) * 100;
+      const pe = s.peRatio || null;
+      if (disc < minDisc) continue;
+      if (pe !== null && (pe > maxPE || pe < 0)) continue;
+      results.push({ ...s, dcf, discount: disc });
+    }
+    results.sort((a,b) => b.discount - a.discount);
+
+    document.getElementById('scLoading').style.display = 'none';
+    if (results.length === 0) { document.getElementById('scResults').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">No stocks matched filters.</div>'; return; }
+
+    document.getElementById('scResults').innerHTML = `
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">${results.length} stocks found</div>
+      <div class="data-table-wrap"><table class="data-table" style="min-width:800px">
+        <thead><tr><th style="text-align:left">Company</th><th>Price</th><th>DCF Value</th><th>Discount</th><th>P/E</th><th>Sector</th></tr></thead>
+        <tbody>${results.slice(0,50).map(r => `
+          <tr style="cursor:pointer" onclick="document.getElementById('reportTicker').value='${r.symbol}';navigateTo('reports');generateReport()">
+            <td style="text-align:left"><strong>${r.symbol}</strong><br><span style="font-size:10px;color:var(--text-muted);font-family:'DM Sans',sans-serif">${(r.companyName||'').slice(0,30)}</span></td>
+            <td>${fmtDollar(r.price)}</td>
+            <td>${fmtDollar(r.dcf)}</td>
+            <td><span class="discount-badge ${r.discount>30?'deep':r.discount>15?'moderate':'slight'}">${fmtPct(r.discount)}</span></td>
+            <td>${r.peRatio?fmt(r.peRatio,1):'—'}</td>
+            <td style="font-size:11px;font-family:'DM Sans',sans-serif;color:var(--text-muted)">${r.sector||'—'}</td>
+          </tr>`).join('')}
+        </tbody></table></div>`;
+  } catch(err) {
+    document.getElementById('scLoading').style.display = 'none';
+    document.getElementById('scResults').innerHTML = `<div style="color:var(--bear);padding:20px">${err.message}</div>`;
+  } finally { btn.disabled = false; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAGE: MARKET PULSE (lazy-loaded)
+// ═══════════════════════════════════════════════════════════
+function initNewsFeed() {
+  const c = document.getElementById('newsContent');
+  c.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <input class="tool-search-input" id="newsTicker" type="text" placeholder="Filter by ticker — AAPL, TSLA…" style="max-width:300px" onkeydown="if(event.key==='Enter') fetchNews()">
+      <button class="tool-btn" onclick="fetchNews()">Search</button>
+      <button class="tool-btn" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border)" onclick="fetchGeneralNews()">All News</button>
+    </div>
+    <div id="newsLoading" class="page-loading" style="display:none"><div class="loader"></div><div class="loading-text">Loading news…</div></div>
+    <div id="newsFeed"></div>`;
+  fetchGeneralNews();
+}
+
+async function fetchGeneralNews() {
+  if (!FINNHUB_KEY) { document.getElementById('newsFeed').innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">Add your Finnhub API key to view live market news.</div>'; return; }
+  document.getElementById('newsLoading').style.display = 'block';
+  document.getElementById('newsFeed').innerHTML = '';
+  try {
+    const res = await fetch(`${FINNHUB}/news?category=general&token=${FINNHUB_KEY}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('No news');
+    renderNews(data.slice(0, 30));
+  } catch(e) { document.getElementById('newsFeed').innerHTML = `<div style="color:var(--bear)">${e.message}</div>`; }
+  document.getElementById('newsLoading').style.display = 'none';
+}
+
+async function fetchNews() {
+  const ticker = document.getElementById('newsTicker').value.trim().toUpperCase();
+  if (!ticker) { fetchGeneralNews(); return; }
+  if (!FINNHUB_KEY) return;
+  document.getElementById('newsLoading').style.display = 'block';
+  document.getElementById('newsFeed').innerHTML = '';
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const ago = new Date(Date.now()-30*86400000).toISOString().split('T')[0];
+    const res = await fetch(`${FINNHUB}/company-news?symbol=${ticker}&from=${ago}&to=${today}&token=${FINNHUB_KEY}`);
+    const data = await res.json();
+    renderNews((data||[]).slice(0, 30));
+  } catch(e) { document.getElementById('newsFeed').innerHTML = `<div style="color:var(--bear)">${e.message}</div>`; }
+  document.getElementById('newsLoading').style.display = 'none';
+}
+
+function renderNews(articles) {
+  const feed = document.getElementById('newsFeed');
+  if (!articles.length) { feed.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">No news found.</div>'; return; }
+
+  const sentimentize = (text) => {
+    const l = (text||'').toLowerCase();
+    const bull = ['surge','soar','rally','jump','beat','record','growth','strong','upgrade','profit','gain','boom','bullish'];
+    const bear = ['crash','plunge','drop','fall','miss','decline','weak','downgrade','loss','cut','layoff','bearish','risk','fear','sell'];
+    let s = 0; bull.forEach(w => { if (l.includes(w)) s++; }); bear.forEach(w => { if (l.includes(w)) s--; });
+    return s >= 2 ? 'positive' : s <= -2 ? 'negative' : 'neutral';
+  };
+
+  feed.innerHTML = `<div style="display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden">${
+    articles.map(a => {
+      const sent = sentimentize(a.headline + ' ' + (a.summary||''));
+      const sentLabel = sent === 'positive' ? 'BULLISH' : sent === 'negative' ? 'BEARISH' : 'NEUTRAL';
+      return `<div style="background:var(--surface);padding:20px;cursor:pointer;transition:background 0.15s" onclick="window.open('${a.url}','_blank')" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='var(--surface)'">
+        <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:8px">
+          <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;line-height:1.4;flex:1">${escapeHtml(a.headline)}</div>
+          <span class="sentiment-badge ${sent}">${sentLabel}</span>
+        </div>
+        ${a.summary ? `<div style="font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;font-weight:300">${escapeHtml((a.summary||'').slice(0,180))}${a.summary.length>180?'…':''}</div>` : ''}
+        <div style="display:flex;gap:16px;font-size:11px;color:var(--text-muted)">
+          <span style="font-weight:500;color:var(--text-secondary)">${escapeHtml(a.source)}</span>
+          <span>${a.datetime ? timeAgo(a.datetime*1000) : ''}</span>
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAGE: BACKTEST LAB (lazy-loaded)
+// ═══════════════════════════════════════════════════════════
+let btStrategy = 'sma_cross';
+
+function initBacktestLab() {
+  const c = document.getElementById('backtestContent');
+  const today = new Date().toISOString().split('T')[0];
+  c.innerHTML = `
+    <div class="tool-card" style="margin-bottom:24px">
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:32px">
+        <div>
+          <div class="kpi-label" style="margin-bottom:12px">SELECT STRATEGY</div>
+          <div id="btStratList" style="display:flex;flex-direction:column;gap:6px">
+            <div class="bt-strat selected" data-s="sma_cross" onclick="selectBTStrategy('sma_cross',this)"><strong>SMA Crossover</strong><br><span style="font-size:11px;color:var(--text-muted)">Fast/slow moving average cross</span></div>
+            <div class="bt-strat" data-s="rsi" onclick="selectBTStrategy('rsi',this)"><strong>RSI Mean Reversion</strong><br><span style="font-size:11px;color:var(--text-muted)">Buy oversold, sell overbought</span></div>
+            <div class="bt-strat" data-s="momentum" onclick="selectBTStrategy('momentum',this)"><strong>Momentum (ROC)</strong><br><span style="font-size:11px;color:var(--text-muted)">Rate of change threshold</span></div>
+            <div class="bt-strat" data-s="bollinger" onclick="selectBTStrategy('bollinger',this)"><strong>Bollinger Bounce</strong><br><span style="font-size:11px;color:var(--text-muted)">Buy lower band, sell upper</span></div>
+            <div class="bt-strat" data-s="macd" onclick="selectBTStrategy('macd',this)"><strong>MACD Signal</strong><br><span style="font-size:11px;color:var(--text-muted)">MACD/signal crossover</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="kpi-label" style="margin-bottom:12px">PARAMETERS</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+            <div><label style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.08em">TICKER</label><input class="tool-search-input" id="btTicker" value="AAPL" style="max-width:100%;margin-top:4px;padding:8px;font-size:12px"></div>
+            <div><label style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.08em">START</label><input class="tool-search-input" id="btStart" type="date" value="2020-01-01" style="max-width:100%;margin-top:4px;padding:8px;font-size:12px"></div>
+            <div><label style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.08em">END</label><input class="tool-search-input" id="btEnd" type="date" value="${today}" style="max-width:100%;margin-top:4px;padding:8px;font-size:12px"></div>
+            <div><label style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.08em">CAPITAL ($)</label><input class="tool-search-input" id="btCapital" type="number" value="100000" style="max-width:100%;margin-top:4px;padding:8px;font-size:12px"></div>
+            <div id="btStratParams"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:16px;align-items:center">
+        <button class="tool-btn" id="btRunBtn" onclick="runBT()">Run Backtest</button>
+        <span id="btStatus" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted)"></span>
+      </div>
+    </div>
+    <div id="btLoading" class="page-loading" style="display:none"><div class="loader"></div><div class="loading-text" id="btLoadingText">Loading…</div></div>
+    <div id="btResults" style="display:none"></div>`;
+
+  // Add bt-strat style
+  if (!document.getElementById('bt-style')) {
+    const s = document.createElement('style');
+    s.id = 'bt-style';
+    s.textContent = `.bt-strat { padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:all 0.15s; font-size:12px; } .bt-strat:hover { border-color:var(--border-strong); } .bt-strat.selected { border-color:var(--accent); background:var(--accent-light); }`;
+    document.head.appendChild(s);
+  }
+  renderBTParams();
+}
+
+function selectBTStrategy(s, el) { btStrategy = s; document.querySelectorAll('.bt-strat').forEach(e => e.classList.remove('selected')); el.classList.add('selected'); renderBTParams(); }
+
+function renderBTParams() {
+  const params = { sma_cross: [{id:'fast',l:'Fast SMA',v:20},{id:'slow',l:'Slow SMA',v:50}], rsi: [{id:'period',l:'RSI Period',v:14},{id:'over',l:'Oversold',v:30},{id:'under',l:'Overbought',v:70}], momentum: [{id:'roc',l:'ROC Period',v:20},{id:'thresh',l:'Entry %',v:5}], bollinger: [{id:'period',l:'BB Period',v:20},{id:'std',l:'Std Devs',v:2}], macd: [{id:'fast',l:'Fast EMA',v:12},{id:'slow',l:'Slow EMA',v:26},{id:'sig',l:'Signal',v:9}] };
+  const p = params[btStrategy] || [];
+  document.getElementById('btStratParams').innerHTML = p.map(x => `<div style="margin-top:4px"><label style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.08em">${x.l.toUpperCase()}</label><input class="tool-search-input" id="bt_${x.id}" type="number" value="${x.v}" style="max-width:100%;margin-top:4px;padding:8px;font-size:12px"></div>`).join('');
+}
+
+// Indicators
+function calcSMA(p,n){ const r=Array(p.length).fill(null); for(let i=n-1;i<p.length;i++){let s=0;for(let j=i-n+1;j<=i;j++)s+=p[j];r[i]=s/n;} return r; }
+function calcEMA(p,n){ const r=Array(p.length).fill(null);const m=2/(n+1);let s=0;for(let i=0;i<n;i++)s+=p[i];r[n-1]=s/n;for(let i=n;i<p.length;i++)r[i]=(p[i]-r[i-1])*m+r[i-1];return r; }
+function calcRSI(p,n){const r=Array(p.length).fill(null);const g=[],l=[];for(let i=1;i<p.length;i++){const c=p[i]-p[i-1];g.push(c>0?c:0);l.push(c<0?-c:0);}if(g.length<n)return r;let ag=g.slice(0,n).reduce((s,v)=>s+v,0)/n;let al=l.slice(0,n).reduce((s,v)=>s+v,0)/n;r[n]=al===0?100:100-(100/(1+ag/al));for(let i=n;i<g.length;i++){ag=(ag*(n-1)+g[i])/n;al=(al*(n-1)+l[i])/n;r[i+1]=al===0?100:100-(100/(1+ag/al));}return r;}
+
+function btSignals(prices, strat) {
+  const s = Array(prices.length).fill(0);
+  const gv = (id) => parseFloat(document.getElementById('bt_'+id)?.value || 0);
+  if (strat === 'sma_cross') {
+    const fast = calcSMA(prices, gv('fast')), slow = calcSMA(prices, gv('slow'));
+    for (let i=1;i<prices.length;i++){if(!fast[i]||!slow[i]||!fast[i-1]||!slow[i-1])continue;if(fast[i]>slow[i]&&fast[i-1]<=slow[i-1])s[i]=1;else if(fast[i]<slow[i]&&fast[i-1]>=slow[i-1])s[i]=-1;}
+  } else if (strat === 'rsi') {
+    const rsi = calcRSI(prices, gv('period'));
+    for(let i=1;i<prices.length;i++){if(!rsi[i])continue;if(rsi[i]<gv('over')&&(!rsi[i-1]||rsi[i-1]>=gv('over')))s[i]=1;else if(rsi[i]>gv('under')&&(!rsi[i-1]||rsi[i-1]<=gv('under')))s[i]=-1;}
+  } else if (strat === 'momentum') {
+    const n=gv('roc'),th=gv('thresh');
+    for(let i=n;i<prices.length;i++){const roc=((prices[i]-prices[i-n])/prices[i-n])*100;const prev=i>n?((prices[i-1]-prices[i-1-n])/prices[i-1-n])*100:null;if(roc>=th&&(prev===null||prev<th))s[i]=1;else if(roc<=0&&(prev===null||prev>0))s[i]=-1;}
+  } else if (strat === 'bollinger') {
+    const n=gv('period'),sd=gv('std'),sma=calcSMA(prices,n);
+    for(let i=n;i<prices.length;i++){let sq=0;for(let j=i-n+1;j<=i;j++)sq+=Math.pow(prices[j]-sma[i],2);const d=Math.sqrt(sq/n);const lo=sma[i]-sd*d,hi=sma[i]+sd*d;if(prices[i]<=lo&&prices[i-1]>sma[i-1]-sd*d)s[i]=1;else if(prices[i]>=hi&&prices[i-1]<sma[i-1]+sd*d)s[i]=-1;}
+  } else if (strat === 'macd') {
+    const fe=calcEMA(prices,gv('fast')),se=calcEMA(prices,gv('slow'));
+    const ml=prices.map((_,i)=>(fe[i]!=null&&se[i]!=null)?fe[i]-se[i]:null);
+    const mv=ml.filter(v=>v!=null),sig=calcEMA(mv,gv('sig'));
+    const sl=Array(prices.length).fill(null);let idx=0;for(let i=0;i<prices.length;i++){if(ml[i]!=null){sl[i]=sig[idx]||null;idx++;}}
+    for(let i=1;i<prices.length;i++){if(!ml[i]||!sl[i]||!ml[i-1]||!sl[i-1])continue;if(ml[i]>sl[i]&&ml[i-1]<=sl[i-1])s[i]=1;else if(ml[i]<sl[i]&&ml[i-1]>=sl[i-1])s[i]=-1;}
+  }
+  return s;
+}
+
+async function runBT() {
+  const ticker = document.getElementById('btTicker').value.trim().toUpperCase();
+  if (!ticker) return;
+  const btn = document.getElementById('btRunBtn'); btn.disabled = true;
+  document.getElementById('btResults').style.display = 'none';
+  document.getElementById('btLoading').style.display = 'block';
+  document.getElementById('btLoadingText').textContent = 'Fetching price data…';
+
+  try {
+    const start = document.getElementById('btStart').value, end = document.getElementById('btEnd').value;
+    const capital = parseFloat(document.getElementById('btCapital').value) || 100000;
+    const res = await fetch(`${FMP}/historical-price-eod/full?symbol=${ticker}&from=${start}&to=${end}&apikey=${FMP_KEY}`);
+    const data = await res.json();
+    if (data && data['Error Message']) throw new Error('FMP: ' + data['Error Message']);
+    const hist_data = data.historical || data;
+    if (!Array.isArray(hist_data) || hist_data.length < 30) throw new Error(`Insufficient data for ${ticker}.`);
+
+    const hist = hist_data.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+    const prices = hist.map(d => d.close), dates = hist.map(d => d.date);
+
+    document.getElementById('btLoadingText').textContent = 'Running simulation…';
+    await sleep(100);
+
+    const signals = btSignals(prices, btStrategy);
+    let cash = capital, shares = 0, position = false, entryPrice = 0, entryIdx = 0;
+    const equity = [capital], trades = [];
+    const benchShares = Math.floor(capital * 0.95 / prices[0]);
+    const benchCash = capital - benchShares * prices[0];
+
+    for (let i = 0; i < prices.length; i++) {
+      if (signals[i] === 1 && !position) { const alloc = cash * 0.95; shares = Math.floor(alloc / prices[i]); if (shares > 0) { cash -= shares * prices[i]; position = true; entryPrice = prices[i]; entryIdx = i; } }
+      else if (signals[i] === -1 && position) { const pnl = (prices[i] - entryPrice) * shares; cash += shares * prices[i]; trades.push({ entry: dates[entryIdx], exit: dates[i], entryP: entryPrice, exitP: prices[i], shares, pnl, pnlPct: ((prices[i]-entryPrice)/entryPrice)*100, bars: i-entryIdx }); shares = 0; position = false; }
+      equity.push(cash + shares * prices[i]);
+    }
+    if (position) { cash += shares * prices[prices.length-1]; trades.push({ entry: dates[entryIdx], exit: dates[dates.length-1]+' (open)', entryP: entryPrice, exitP: prices[prices.length-1], shares, pnl: (prices[prices.length-1]-entryPrice)*shares, pnlPct: ((prices[prices.length-1]-entryPrice)/entryPrice)*100, bars: prices.length-entryIdx }); shares=0; }
+
+    const finalEq = equity[equity.length-1];
+    const totalRet = ((finalEq-capital)/capital)*100;
+    const benchRet = ((benchCash+benchShares*prices[prices.length-1]-capital)/capital)*100;
+    const years = prices.length / 252;
+    const cagr = (Math.pow(finalEq/capital,1/years)-1)*100;
+    const wins = trades.filter(t=>t.pnl>0), losses = trades.filter(t=>t.pnl<=0);
+    const winRate = trades.length > 0 ? (wins.length/trades.length)*100 : 0;
+    let peak = capital, maxDD = 0;
+    for (let i = 1; i < equity.length; i++) { if (equity[i]>peak) peak=equity[i]; const dd=((equity[i]-peak)/peak)*100; if (dd<maxDD) maxDD=dd; }
+    const dailyRet = []; for (let i=1;i<equity.length;i++) dailyRet.push((equity[i]-equity[i-1])/equity[i-1]);
+    const avgR = dailyRet.reduce((s,v)=>s+v,0)/dailyRet.length;
+    const stdR = Math.sqrt(dailyRet.reduce((s,v)=>s+Math.pow(v-avgR,2),0)/dailyRet.length);
+    const sharpe = stdR > 0 ? (avgR/stdR)*Math.sqrt(252) : 0;
+
+    document.getElementById('btLoading').style.display = 'none';
+    document.getElementById('btResults').style.display = 'block';
+    document.getElementById('btResults').innerHTML = `
+      <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
+        <div class="kpi-card"><div class="kpi-label">Total Return</div><div class="kpi-value ${totalRet>=0?'positive':'negative'}">${fmt(totalRet,1)}%</div><div class="kpi-sub">vs ${fmt(benchRet,1)}% buy & hold</div></div>
+        <div class="kpi-card"><div class="kpi-label">CAGR</div><div class="kpi-value ${cagr>=0?'positive':'negative'}">${fmt(cagr,1)}%</div></div>
+        <div class="kpi-card"><div class="kpi-label">Sharpe Ratio</div><div class="kpi-value">${fmt(sharpe,2)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Max Drawdown</div><div class="kpi-value negative">${fmt(maxDD,1)}%</div></div>
+        <div class="kpi-card"><div class="kpi-label">Win Rate</div><div class="kpi-value ${winRate>=50?'positive':'negative'}">${fmt(winRate,0)}%</div><div class="kpi-sub">${trades.length} trades</div></div>
+        <div class="kpi-card"><div class="kpi-label">Final Equity</div><div class="kpi-value">$${fmtB(finalEq)}</div></div>
+      </div>
+      <div class="section-title">Trade Log</div>
+      <div class="section-subtitle">${trades.length} completed trades</div>
+      <div class="data-table-wrap" style="max-height:400px;overflow-y:auto">
+        <table class="data-table" style="min-width:800px">
+          <thead><tr><th style="text-align:left">#</th><th>Entry</th><th>Entry Price</th><th>Exit</th><th>Exit Price</th><th>Shares</th><th>P&L</th><th>P&L %</th><th>Bars</th></tr></thead>
+          <tbody>${trades.map((t,i)=>`<tr>
+            <td style="text-align:left">${i+1}</td><td>${t.entry}</td><td>${fmtDollar(t.entryP)}</td><td>${t.exit}</td><td>${fmtDollar(t.exitP)}</td><td>${t.shares}</td>
+            <td style="color:${t.pnl>=0?'var(--bull)':'var(--bear)'};font-weight:600">${t.pnl>=0?'+':''}$${t.pnl.toFixed(0)}</td>
+            <td style="color:${t.pnlPct>=0?'var(--bull)':'var(--bear)'}">${t.pnlPct>=0?'+':''}${fmt(t.pnlPct,1)}%</td>
+            <td>${t.bars}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div style="margin-top:24px;font-size:11px;color:var(--text-muted);padding-top:16px;border-top:1px solid var(--border)">
+        <strong>Disclaimer:</strong> Backtesting results are hypothetical. Past performance does not guarantee future results. Does not account for slippage or market impact.
+      </div>`;
+    document.getElementById('btStatus').textContent = `${prices.length} bars · ${trades.length} trades`;
+  } catch(err) {
+    document.getElementById('btLoading').style.display = 'none';
+    document.getElementById('btStatus').textContent = 'Error: ' + err.message;
+  } finally { btn.disabled = false; }
+}
+</script>
+</body>
+</html>
